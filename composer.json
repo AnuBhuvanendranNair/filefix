@@ -2,6 +2,7 @@
     "name": "anubit/filefix",
     "type": "typo3-cms-extension",
     "description": "Fileadmin housekeeping toolkit: detect MIME/content mismatches, find and remove unused files.",
+    "license": "GPL-2.0-or-later",
     "authors": [
         {
             "name": "Anu Bhuvanendran Nair",
