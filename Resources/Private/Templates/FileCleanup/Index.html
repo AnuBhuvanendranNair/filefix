@@ -1,0 +1,265 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+<f:layout name="Module" />
+
+<f:section name="Content">
+
+<f:be.pageRenderer includeJavaScriptModules="{0: '@anubit/filefix/file-cleanup.js'}" />
+
+<h1>File Cleanup</h1>
+
+<f:if condition="{totalUnfiltered} == 0">
+    <div class="t3-filelist-info-container">
+        <core:icon identifier="actions-check" size="large" />
+        <h5 class="mt-2">All clean</h5>
+        <p>
+            No unused files or orphaned FAL records found
+            <f:if condition="{folderName} != ''"> in <strong>{folderName}</strong></f:if>.
+        </p>
+    </div>
+</f:if>
+
+<!-- ── Unused Files ─────────────────────────────────────────────────────── -->
+<f:if condition="{totalUnfiltered} > 0">
+    <div class="row align-items-center mb-2">
+        <div class="col">
+            <h2 class="mb-0">
+                <core:icon identifier="mimetypes-media-image" size="small" />
+                Unused Files
+                <small class="text-body-secondary fs-6 fw-normal ms-2">{unusedCount} file(s) are not referenced anywhere<f:if condition="{folderName} != ''"> in <strong>{folderName}</strong></f:if></small>
+            </h2>
+        </div>
+        <div class="col-auto d-flex align-items-center gap-2">
+
+            <!-- ── Show filter dropdown ── -->
+            <form method="get" action="{cleanupActionUrl}" target="_top" class="d-inline">
+                <input type="hidden" name="id" value="{folderId}" />
+                <input type="hidden" name="perPage" value="{perPage}" />
+                <input type="hidden" name="ext" value="{extFilter}" />
+                <input type="hidden" name="viewMode" value="{viewMode}" />
+                <select name="show" class="form-select form-select-sm" style="width:auto"
+                        onchange="this.form.submit()">
+                    <option value="all"     <f:if condition="{showFilter} == 'all'">selected="selected"</f:if>>All unreferenced</option>
+                    <option value="present" <f:if condition="{showFilter} == 'present'">selected="selected"</f:if>>Present on disk</option>
+                    <option value="missing" <f:if condition="{showFilter} == 'missing'">selected="selected"</f:if>>Physically missing</option>
+                </select>
+            </form>
+
+            <!-- ── Extension filter dropdown ── -->
+            <f:if condition="{availableExtensions}">
+                <form method="get" action="{cleanupActionUrl}" target="_top" class="d-inline">
+                    <input type="hidden" name="id" value="{folderId}" />
+                    <input type="hidden" name="perPage" value="{perPage}" />
+                    <input type="hidden" name="show" value="{showFilter}" />
+                    <input type="hidden" name="viewMode" value="{viewMode}" />
+                    <select name="ext" class="form-select form-select-sm" style="width:auto"
+                            onchange="this.form.submit()">
+                        <option value="" <f:if condition="{extFilter} == ''">selected="selected"</f:if>>All types</option>
+                        <f:for each="{availableExtensions}" as="extOption">
+                            <option value="{extOption}" <f:if condition="{extFilter} == {extOption}">selected="selected"</f:if>>.{extOption}</option>
+                        </f:for>
+                    </select>
+                </form>
+            </f:if>
+
+            <!-- ── View mode toggle ── -->
+            <div class="btn-group" role="group" aria-label="View mode">
+                <a href="{viewListUrl}" target="_top"
+                   class="btn btn-sm {f:if(condition:'{viewMode} == \'list\'', then:'btn-primary', else:'btn-default')}">
+                    <core:icon identifier="actions-viewmode-list" size="small" /> List
+                </a>
+                <a href="{viewThumbsUrl}" target="_top"
+                   class="btn btn-sm {f:if(condition:'{viewMode} == \'thumbs\'', then:'btn-primary', else:'btn-default')}">
+                    <core:icon identifier="actions-viewmode-tiles" size="small" /> Thumbnails
+                </a>
+            </div>
+
+            <span class="text-body-secondary small">Show</span>
+            <form method="get" action="{cleanupActionUrl}" target="_top" class="d-inline">
+                <input type="hidden" name="id" value="{folderId}" />
+                <input type="hidden" name="show" value="{showFilter}" />
+                <input type="hidden" name="ext" value="{extFilter}" />
+                <input type="hidden" name="viewMode" value="{viewMode}" />
+                <select name="perPage" class="form-select form-select-sm" style="width:auto"
+                        onchange="this.form.submit()">
+                    <f:for each="{perPageOptions}" as="opt">
+                        <option value="{opt.value}"
+                            <f:if condition="{opt.active}">selected="selected"</f:if>>{opt.value}</option>
+                    </f:for>
+                </select>
+            </form>
+            <form id="flush-folder-form" action="{cleanupActionUrl}" method="post" class="d-inline">
+                <input type="hidden" name="cleanup_type" value="flush_folder" />
+                <input type="hidden" name="redirect_folder_id" value="{folderId}" />
+                <input type="hidden" name="redirect_show" value="{showFilter}" />
+                <input type="hidden" name="redirect_per_page" value="{perPage}" />
+                <input type="hidden" name="redirect_ext" value="{extFilter}" />
+                <input type="hidden" name="redirect_view_mode" value="{viewMode}" />
+                <button type="button" id="flush-folder-btn" class="btn btn-danger btn-sm"
+                        data-count="{unusedCount}" <f:if condition="{unusedCount} == 0">disabled="disabled"</f:if>>
+                    <core:icon identifier="actions-delete" size="small" />
+                    Delete all filtered ({unusedCount})
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <form action="{cleanupActionUrl}" method="post" id="cleanup-unused-form">
+        <input type="hidden" name="cleanup_type" value="unused_files" />
+        <input type="hidden" name="redirect_folder_id" value="{folderId}" />
+        <input type="hidden" name="redirect_show" value="{showFilter}" />
+        <input type="hidden" name="redirect_per_page" value="{perPage}" />
+        <input type="hidden" name="redirect_ext" value="{extFilter}" />
+        <input type="hidden" name="redirect_view_mode" value="{viewMode}" />
+
+        <div class="row row-cols-auto gx-2 mb-2 align-items-center">
+            <div class="col">
+                <strong>Selection</strong>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-default btn-sm" id="cleanup-select-all-unused">
+                    <core:icon identifier="actions-check" size="small" />
+                    <span id="cleanup-label-unused">Select all on page</span>
+                </button>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-default btn-sm"
+                        formaction="{downloadZipUrl}">
+                    <core:icon identifier="actions-download" size="small" />
+                    Download as ZIP
+                </button>
+            </div>
+            <div class="col">
+                <button type="button" id="delete-selected-btn" class="btn btn-danger btn-sm">
+                    <core:icon identifier="actions-delete" size="small" />
+                    Delete selected
+                </button>
+            </div>
+        </div>
+
+        <f:if condition="{viewMode} == 'thumbs'">
+            <f:then>
+                <div class="row row-cols-auto g-3 filefix-cleanup-thumbs">
+                    <f:if condition="{unusedCount} == 0">
+                        <div class="col text-body-secondary">No files match the current filter.</div>
+                    </f:if>
+                    <f:for each="{unusedFiles}" as="file">
+                        <div class="col" style="width:150px">
+                            <label class="card h-100 filefix-cleanup-thumb-card mb-0" style="cursor:pointer">
+                                <div class="d-flex align-items-center justify-content-center bg-body-secondary"
+                                     style="height:150px; overflow:hidden">
+                                    <f:if condition="{file.thumbnailUrl}">
+                                        <f:then>
+                                            <img src="{file.thumbnailUrl}" alt="{file.name}"
+                                                 style="max-width:100%; max-height:100%; object-fit:contain" />
+                                        </f:then>
+                                        <f:else>
+                                            <core:icon identifier="mimetypes-media-image" size="large" />
+                                        </f:else>
+                                    </f:if>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="d-flex align-items-start gap-1">
+                                        <input type="checkbox" name="file_uids[]"
+                                            value="{file.uid}" class="cleanup-checkbox cleanup-unused mt-1" />
+                                        <div class="small text-truncate" title="{file.identifier}">{file.name}</div>
+                                    </div>
+                                    <f:if condition="{file.physicallyMissing}">
+                                        <span class="badge bg-warning text-dark">missing</span>
+                                    </f:if>
+                                    <div class="text-body-secondary" style="font-size:.75rem">
+                                        <f:format.bytes decimals="1">{file.size}</f:format.bytes>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </f:for>
+                </div>
+            </f:then>
+            <f:else>
+                <div class="table-fit">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th class="col-checkbox"></th>
+                                <th>Path</th>
+                                <th>MIME type</th>
+                                <th>Size</th>
+                                <th>Last modified</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <f:if condition="{unusedCount} == 0">
+                                <tr>
+                                    <td colspan="6" class="text-body-secondary">No files match the current filter.</td>
+                                </tr>
+                            </f:if>
+                            <f:for each="{unusedFiles}" as="file">
+                                <tr>
+                                    <td class="col-checkbox">
+                                        <input type="checkbox" name="file_uids[]"
+                                            value="{file.uid}" class="cleanup-checkbox cleanup-unused" />
+                                    </td>
+                                    <td>
+                                        <f:if condition="{file.physicallyMissing}">
+                                            <f:then>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="text-warning"><core:icon identifier="actions-exclamation-triangle" size="small" /></span>
+                                                    <code class="small text-danger">{file.identifier}</code>
+                                                    <span class="badge bg-warning text-dark ms-1">physically missing</span>
+                                                </div>
+                                            </f:then>
+                                            <f:else>
+                                                <code class="small">{file.identifier}</code>
+                                            </f:else>
+                                        </f:if>
+                                    </td>
+                                    <td><code>{file.mime_type}</code></td>
+                                    <td class="text-nowrap"><f:format.bytes decimals="1">{file.size}</f:format.bytes></td>
+                                    <td class="text-nowrap"><f:format.date format="Y-m-d">{file.tstamp}</f:format.date></td>
+                                    <td class="text-nowrap">
+                                        <f:if condition="!{file.physicallyMissing}">
+                                            <a href="{storagePublicBase}{file.identifier}"
+                                               download="{file.name}"
+                                               class="btn btn-default btn-sm"
+                                               title="Download file as backup">
+                                                <core:icon identifier="actions-download" size="small" />
+                                            </a>
+                                        </f:if>
+                                    </td>
+                                </tr>
+                            </f:for>
+                        </tbody>
+                    </table>
+                </div>
+            </f:else>
+        </f:if>
+    </form>
+
+    <!-- Pagination -->
+    <div class="row align-items-center mt-1 mb-4">
+        <div class="col">
+            <small class="text-body-secondary">Showing {rangeFrom}–{rangeTo} of {unusedCount}</small>
+        </div>
+        <div class="col-auto d-flex align-items-center gap-2">
+            <f:if condition="{prevPageUrl}">
+                <a href="{prevPageUrl}" target="_top" class="btn btn-default btn-sm">
+                    <core:icon identifier="actions-arrow-left" size="small" /> Previous
+                </a>
+            </f:if>
+            <span class="text-body-secondary small">Page {currentPage} of {totalPages}</span>
+            <f:if condition="{nextPageUrl}">
+                <a href="{nextPageUrl}" target="_top" class="btn btn-default btn-sm">
+                    Next <core:icon identifier="actions-arrow-right" size="small" />
+                </a>
+            </f:if>
+        </div>
+    </div>
+</f:if>
+
+</f:section>
+</html>

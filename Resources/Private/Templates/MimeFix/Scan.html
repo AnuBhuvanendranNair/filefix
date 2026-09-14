@@ -1,0 +1,127 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+<f:layout name="Module" />
+
+<f:section name="Content">
+
+<f:be.pageRenderer includeJavaScriptModules="{0: '@anubit/filefix/mimefix-scan.js'}" />
+
+<h1>
+    {folderName}
+    <f:if condition="{mismatchCount} > 0">
+        <small class="text-body-secondary fs-6 fw-normal ms-2">{mismatchCount} issue(s) found</small>
+    </f:if>
+</h1>
+
+<f:if condition="{mismatchCount} > 0">
+    <f:then>
+        <form action="{fixActionUrl}" method="post" id="mimefixFixForm">
+            <input type="hidden" name="mimefix_fix" value="1" />
+            <input type="hidden" name="folderId" value="{folderIdentifier}" />
+
+            <div class="row row-cols-auto gx-2 mb-2 align-items-center">
+                <div class="col">
+                    <strong>Selection</strong>
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-default btn-sm" id="mimefix-select-all">
+                        <core:icon identifier="actions-check" size="small" />
+                        <span id="mimefix-select-label">Select all actionable ({selectableCount})</span>
+                    </button>
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-default btn-sm" id="mimefix-fix-btn">
+                        <core:icon identifier="actions-document-synchronize" size="small" />
+                        Fix selected
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-fit">
+                <table class="table table-striped table-hover" id="typo3-mimefix">
+                    <thead>
+                        <tr>
+                            <th class="col-checkbox"></th>
+                            <th>File</th>
+                            <th>Extension</th>
+                            <th>Actual MIME</th>
+                            <th>Expected MIME</th>
+                            <th>DB MIME (sys_file)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <f:for each="{mismatches}" as="item">
+                            <tr>
+                                <td class="col-checkbox">
+                                    <f:if condition="{item.selectable}">
+                                        <f:then>
+                                            <input type="checkbox" name="files[]"
+                                                value="{item.path}" class="mimefix-checkbox" />
+                                        </f:then>
+                                        <f:else>&mdash;</f:else>
+                                    </f:if>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <core:icon identifier="mimetypes-media-image" size="small" />
+                                        <code class="small">{item.relativePath}</code>
+                                    </div>
+                                </td>
+                                <td><code>.{item.extension}</code></td>
+                                <td><code>{item.actualMime}</code></td>
+                                <td><code>{item.expectedMime}</code></td>
+                                <td>
+                                    <f:if condition="{item.dbMime}">
+                                        <f:then>
+                                            <code class="{f:if(condition: item.dbOutOfSync, then: 'text-danger')}">{item.dbMime}</code>
+                                        </f:then>
+                                        <f:else>
+                                            <span class="text-body-secondary">not indexed</span>
+                                        </f:else>
+                                    </f:if>
+                                </td>
+                                <td>
+                                    <f:if condition="{item.contentMismatch}">
+                                        <f:then>
+                                            <f:if condition="{item.fixable}">
+                                                <f:then>
+                                                    <span class="badge badge-warning">
+                                                        <core:icon identifier="actions-exclamation-triangle" size="small" />
+                                                        Fixable
+                                                    </span>
+                                                </f:then>
+                                                <f:else>
+                                                    <span class="badge badge-danger">Cannot fix</span>
+                                                </f:else>
+                                            </f:if>
+                                        </f:then>
+                                        <f:else>
+                                            <span class="badge badge-info">
+                                                <core:icon identifier="actions-database" size="small" />
+                                                DB out of sync
+                                            </span>
+                                        </f:else>
+                                    </f:if>
+                                </td>
+                            </tr>
+                        </f:for>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </f:then>
+    <f:else>
+        <div class="t3-filelist-info-container">
+            <core:icon identifier="actions-check" size="large" />
+            <h5 class="mt-2">No issues found</h5>
+            <p>All files in <strong>{folderName}</strong> have correct content and matching sys_file records.</p>
+        </div>
+    </f:else>
+</f:if>
+
+</f:section>
+</html>

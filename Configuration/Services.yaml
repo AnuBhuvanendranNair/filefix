@@ -1,0 +1,28 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Anubit\Filefix\:
+    resource: '../Classes/*'
+
+  Anubit\Filefix\Controller\FileCleanupController:
+    public: true
+
+  Anubit\Filefix\Controller\QuarantineController:
+    public: true
+
+  Anubit\Filefix\Command\ScanCleanupCandidatesCommand:
+    tags:
+      - name: console.command
+        command: 'filefix:cleanup:scan'
+        description: 'Scan file storages for cleanup candidates and queue them in tx_filefix_quarantine'
+        schedulable: false
+
+  Anubit\Filefix\Command\FlushCleanupCandidatesCommand:
+    tags:
+      - name: console.command
+        command: 'filefix:cleanup:flush'
+        description: 'Process queued cleanup candidates: move to quarantine or permanently delete quarantined files'
+        schedulable: false

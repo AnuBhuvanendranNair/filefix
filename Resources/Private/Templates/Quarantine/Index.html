@@ -1,0 +1,652 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+<f:layout name="Module" />
+
+<f:section name="Content">
+
+<!-- ── View switcher ──────────────────────────────────────────────────────── -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="mb-0">
+        <f:if condition="{view} == 'log'">
+            <f:then>Activity Log</f:then>
+            <f:else>File Quarantine Queue</f:else>
+        </f:if>
+        <f:if condition="{view} == 'quarantine' && {totalCount} > 0">
+            <small class="text-body-secondary fs-6 fw-normal ms-2">{totalCount} record(s)<f:if condition="{folderName} != ''"> in <strong>{folderName}</strong></f:if></small>
+        </f:if>
+        <f:if condition="{view} == 'log' && {logTotal} > 0">
+            <small class="text-body-secondary fs-6 fw-normal ms-2">{logTotal} entries</small>
+        </f:if>
+    </h1>
+    <form method="get" action="{moduleUrl}" target="_top" class="d-inline">
+        <f:if condition="{folderId} != ''">
+            <input type="hidden" name="id" value="{folderId}" />
+        </f:if>
+        <select name="view" class="form-select form-select-sm" style="width:auto"
+                onchange="this.form.submit()">
+            <option value="quarantine" <f:if condition="{view} == 'quarantine'">selected="selected"</f:if>>Quarantine Queue</option>
+            <option value="log"        <f:if condition="{view} == 'log'">selected="selected"</f:if>>Activity Log</option>
+        </select>
+    </form>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- QUARANTINE VIEW                                                          -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<f:if condition="{view} == 'quarantine'">
+
+<!-- ── Scan form (collapsible) ────────────────────────────────────────────── -->
+<div class="mb-3">
+    <button class="btn btn-default btn-sm" type="button"
+            data-bs-toggle="collapse" data-bs-target="#scan-panel" aria-expanded="false">
+        <core:icon identifier="actions-search" size="small" /> Quick Scan
+    </button>
+    <div class="collapse mt-2" id="scan-panel">
+        <div class="card card-body py-3">
+            <form id="scan-run-form" method="post" action="{actionUrl}">
+                <input type="hidden" name="bulk_action" value="scan_folder" />
+                <input type="hidden" name="redirect_params[status]"      value="{currentFilters.status}" />
+                <input type="hidden" name="redirect_params[level]"       value="{currentFilters.level}" />
+                <input type="hidden" name="redirect_params[reason]"      value="{currentFilters.reason}" />
+                <input type="hidden" name="redirect_params[scan_id]"     value="{currentFilters.scanId}" />
+                <input type="hidden" name="redirect_params[id]"          value="{folderId}" />
+                <input type="hidden" name="redirect_params[perPage]"     value="{perPage}" />
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small mb-1">Storage</label>
+                        <select name="scan_storage_uid" class="form-select form-select-sm">
+                            <f:for each="{availableStorages}" as="uid">
+                                <option value="{uid}">Storage {uid}</option>
+                            </f:for>
+                            <f:if condition="!{availableStorages}">
+                                <option value="1">Storage 1</option>
+                            </f:if>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small mb-1">Folder prefix (from tree selection)</label>
+                        <input type="text" name="scan_folder" value="{currentFilters.folder}"
+                               class="form-control form-control-sm" placeholder="/Banner/" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">Level</label>
+                        <select name="scan_level" class="form-select form-select-sm" title="How many subfolder levels below the folder prefix to scan">
+                            <option value="0" <f:if condition="{currentFilters.level} == 0">selected="selected"</f:if>>All levels</option>
+                            <option value="1" <f:if condition="{currentFilters.level} == 1">selected="selected"</f:if>>Level 1 (this folder only)</option>
+                            <option value="2" <f:if condition="{currentFilters.level} == 2">selected="selected"</f:if>>Level 2 (+1 subfolder)</option>
+                            <option value="3" <f:if condition="{currentFilters.level} == 3">selected="selected"</f:if>>Level 3 (+2 subfolders)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">Older than (days)</label>
+                        <input type="number" name="scan_older_than" value="90" min="0"
+                               class="form-control form-control-sm" title="0 = no age limit" />
+                    </div>
+                    <div class="col-md-auto">
+                        <label class="form-label small mb-1 d-block">Include</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="checkbox" name="scan_unused" value="1" id="scan-unused" checked="checked" />
+                                <label class="form-check-label small" for="scan-unused">Unused</label>
+                            </div>
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="checkbox" name="scan_missing" value="1" id="scan-missing" />
+                                <label class="form-check-label small" for="scan-missing">Missing</label>
+                            </div>
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="checkbox" name="scan_orphans" value="1" id="scan-orphans" />
+                                <label class="form-check-label small" for="scan-orphans">Orphans</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="button" id="scan-run-btn" class="btn btn-primary btn-sm">
+                            <core:icon identifier="actions-play" size="small" /> Run scan
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Folder selection lives in the native TYPO3 file tree (navigationComponent) on the left;
+     no in-module folder panel needed. -->
+
+        <!-- ── Status Summary ─────────────────────────────────────────────── -->
+        <div class="row g-2 mb-3">
+            <div class="col-auto">
+                <div class="card border-warning text-center px-3 py-2" style="min-width:100px">
+                    <div class="fs-5 fw-bold text-warning">{statusCounts.candidate.count -> f:format.number(decimals: 0)}</div>
+                    <div class="small text-body-secondary">Candidate</div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="card border-danger text-center px-3 py-2" style="min-width:100px">
+                    <div class="fs-5 fw-bold text-danger">{statusCounts.quarantined.count -> f:format.number(decimals: 0)}</div>
+                    <div class="small text-body-secondary">Quarantined</div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="card border-secondary text-center px-3 py-2" style="min-width:100px">
+                    <div class="fs-5 fw-bold">{statusCounts.failed.count -> f:format.number(decimals: 0)}</div>
+                    <div class="small text-body-secondary">Failed</div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="card border-info text-center px-3 py-2" style="min-width:100px">
+                    <div class="fs-5 fw-bold text-info"><f:format.bytes decimals="1">{reclaimableSize}</f:format.bytes></div>
+                    <div class="small text-body-secondary">Reclaimable</div>
+                </div>
+            </div>
+            <div class="col-auto ms-auto d-flex align-items-center">
+                <form id="clear-queue-form" method="post" action="{actionUrl}">
+                    <input type="hidden" name="bulk_action" value="clear_queue" />
+                    <input type="hidden" name="clear_type" value="all" />
+                    <input type="hidden" name="redirect_params[id]" value="{folderId}" />
+                    <input type="hidden" name="redirect_params[perPage]" value="{perPage}" />
+                    <button type="submit" id="clear-queue-btn" class="btn btn-outline-danger btn-sm" name="bulk_action" value="clear_queue">
+                        <core:icon identifier="actions-delete" size="small" /> Clear queue
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ── Filters ────────────────────────────────────────────────────── -->
+        <form method="get" action="{filterFormUrl}" class="row g-2 mb-3 align-items-end" target="_top">
+            <input type="hidden" name="view" value="quarantine" />
+            <f:if condition="{folderId} != ''">
+                <input type="hidden" name="id" value="{folderId}" />
+            </f:if>
+            <div class="col-auto">
+                <label class="form-label small mb-1">Status</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">All statuses</option>
+                    <f:for each="{availableStatuses}" as="s">
+                        <option value="{s}" <f:if condition="{currentFilters.status} == {s}">selected="selected"</f:if>>{s}</option>
+                    </f:for>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label class="form-label small mb-1">Level</label>
+                <select name="level" class="form-select form-select-sm" title="How many subfolder levels below the selected folder to include">
+                    <option value="0" <f:if condition="{currentFilters.level} == 0">selected="selected"</f:if>>All levels</option>
+                    <option value="1" <f:if condition="{currentFilters.level} == 1">selected="selected"</f:if>>Level 1 (this folder only)</option>
+                    <option value="2" <f:if condition="{currentFilters.level} == 2">selected="selected"</f:if>>Level 2 (+1 subfolder)</option>
+                    <option value="3" <f:if condition="{currentFilters.level} == 3">selected="selected"</f:if>>Level 3 (+2 subfolders)</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label class="form-label small mb-1">Reason</label>
+                <select name="reason" class="form-select form-select-sm">
+                    <option value="">All reasons</option>
+                    <f:for each="{availableReasons}" as="r">
+                        <option value="{r}" <f:if condition="{currentFilters.reason} == {r}">selected="selected"</f:if>>{r}</option>
+                    </f:for>
+                </select>
+            </div>
+            <f:if condition="{availableScanIds}">
+                <div class="col-auto">
+                    <label class="form-label small mb-1">Scan ID</label>
+                    <select name="scan_id" class="form-select form-select-sm" style="max-width:200px">
+                        <option value="">All scans</option>
+                        <f:for each="{availableScanIds}" as="sid">
+                            <option value="{sid}" <f:if condition="{currentFilters.scanId} == {sid}">selected="selected"</f:if>>{sid}</option>
+                        </f:for>
+                    </select>
+                </div>
+            </f:if>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-default btn-sm">
+                    <core:icon identifier="actions-filter" size="small" /> Filter
+                </button>
+                <a href="{filterFormUrl}?view=quarantine&amp;id={folderId}" class="btn btn-default btn-sm ms-1" target="_top">Clear</a>
+            </div>
+        </form>
+
+        <!-- ── Empty state ────────────────────────────────────────────────── -->
+        <f:if condition="{totalCount} == 0">
+            <div class="t3-filelist-info-container">
+                <core:icon identifier="actions-check" size="large" />
+                <h5 class="mt-2">Queue is empty</h5>
+                <p>No quarantine records match the current filter. Use Quick Scan above or run <code>filefix:cleanup:scan</code> to populate the queue.</p>
+            </div>
+        </f:if>
+
+        <!-- ── Bulk action form ────────────────────────────────────────────── -->
+        <f:if condition="{totalCount} > 0">
+            <form method="post" action="{actionUrl}" id="quarantine-form">
+                <input type="hidden" name="redirect_params[status]"      value="{currentFilters.status}" />
+                <input type="hidden" name="redirect_params[level]"       value="{currentFilters.level}" />
+                <input type="hidden" name="redirect_params[reason]"      value="{currentFilters.reason}" />
+                <input type="hidden" name="redirect_params[scan_id]"     value="{currentFilters.scanId}" />
+                <input type="hidden" name="redirect_params[id]"          value="{folderId}" />
+                <input type="hidden" name="redirect_params[page]"        value="{currentPage}" />
+                <input type="hidden" name="redirect_params[perPage]"     value="{perPage}" />
+
+                <div class="row row-cols-auto gx-2 mb-2 align-items-center">
+                    <div class="col">
+                        <button type="button" class="btn btn-default btn-sm" id="q-select-all-btn">
+                            <core:icon identifier="actions-check" size="small" />
+                            <span id="q-select-label">Select all on page</span>
+                        </button>
+                    </div>
+                    <div class="col">
+                        <div class="input-group input-group-sm">
+                            <select name="bulk_action" class="form-select form-select-sm" id="bulk-action-select">
+                                <option value="">— Choose action —</option>
+                                <option value="recheck">Re-check selected</option>
+                                <option value="quarantine">Move to quarantine (candidates only)</option>
+                                <option value="restore">Restore from quarantine (quarantined only)</option>
+                                <option value="delete">Permanently delete (quarantined only)</option>
+                                <option value="skip">Keep / skip — remove from queue (candidates)</option>
+                            </select>
+                            <button type="button" class="btn btn-default btn-sm" id="bulk-apply-btn">
+                                Apply to selected
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col ms-auto">
+                        <label class="text-body-secondary small me-1" for="q-per-page-select">Show</label>
+                        <select id="q-per-page-select" class="form-select form-select-sm d-inline-block" style="width:auto">
+                            <f:for each="{perPageOptions}" as="opt">
+                                <option value="{opt.value}" data-url="{opt.url}" <f:if condition="{opt.active}">selected="selected"</f:if>>{opt.value}</option>
+                            </f:for>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-fit">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th class="col-checkbox"></th>
+                                <th>UID</th>
+                                <th>File</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th class="text-end">Size</th>
+                                <th>Storage</th>
+                                <th>Queued</th>
+                                <th>Error / Info</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <f:for each="{records}" as="rec">
+                                <tr>
+                                    <td class="col-checkbox">
+                                        <input type="checkbox" name="record_uids[]" value="{rec.uid}" class="q-cb" />
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <span class="text-body-secondary small">{rec.uid}</span>
+                                    </td>
+                                    <td>
+                                        <code class="small">{rec.identifier}</code>
+                                        <f:if condition="{rec.name}">
+                                            <span class="text-body-secondary small ms-1">{rec.name}</span>
+                                        </f:if>
+                                        <f:if condition="{rec.quarantine_identifier}">
+                                            <div class="text-muted small mt-1">
+                                                <core:icon identifier="actions-move" size="small" />
+                                                quarantine: <code>{rec.quarantine_identifier}</code>
+                                            </div>
+                                        </f:if>
+                                    </td>
+                                    <td>
+                                        <f:if condition="{rec.reason} == 'unused_fal_file'">
+                                            <f:then><span class="badge bg-warning text-dark">unused</span></f:then>
+                                        </f:if>
+                                        <f:if condition="{rec.reason} == 'missing_physical_file'">
+                                            <f:then><span class="badge bg-secondary">missing</span></f:then>
+                                        </f:if>
+                                        <f:if condition="{rec.reason} == 'physical_orphan'">
+                                            <f:then><span class="badge bg-info text-dark">orphan</span></f:then>
+                                        </f:if>
+                                    </td>
+                                    <td>
+                                        <f:if condition="{rec.status} == 'candidate'">
+                                            <f:then><span class="badge bg-warning text-dark">candidate</span></f:then>
+                                        </f:if>
+                                        <f:if condition="{rec.status} == 'quarantined'">
+                                            <f:then><span class="badge bg-danger">quarantined</span></f:then>
+                                        </f:if>
+                                        <f:if condition="{rec.status} == 'flushed'">
+                                            <f:then><span class="badge bg-success">flushed</span></f:then>
+                                        </f:if>
+                                        <f:if condition="{rec.status} == 'restored'">
+                                            <f:then><span class="badge bg-primary">restored</span></f:then>
+                                        </f:if>
+                                        <f:if condition="{rec.status} == 'skipped'">
+                                            <f:then><span class="badge bg-secondary">skipped</span></f:then>
+                                        </f:if>
+                                        <f:if condition="{rec.status} == 'failed'">
+                                            <f:then><span class="badge bg-dark">failed</span></f:then>
+                                        </f:if>
+                                    </td>
+                                    <td class="text-end text-nowrap">
+                                        <f:if condition="{rec.size} > 0">
+                                            <f:format.bytes decimals="1">{rec.size}</f:format.bytes>
+                                        </f:if>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <span class="text-body-secondary small">#{rec.storage_uid}</span>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <span class="text-body-secondary small">
+                                            <f:format.date format="Y-m-d">{rec.created_at}</f:format.date>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <f:if condition="{rec.error_message}">
+                                            <small class="text-danger">{rec.error_message}</small>
+                                        </f:if>
+                                        <f:if condition="{rec.scan_id}">
+                                            <small class="text-body-secondary d-block">{rec.scan_id}</small>
+                                        </f:if>
+                                    </td>
+                                </tr>
+                            </f:for>
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+
+            <div class="row align-items-center mt-1 mb-4">
+                <div class="col">
+                    <small class="text-body-secondary">Showing {rangeFrom}–{rangeTo} of {totalCount} · Page {currentPage} of {totalPages}</small>
+                </div>
+                <div class="col-auto d-flex align-items-center gap-1">
+                    <f:if condition="{firstPageUrl}">
+                        <a href="{firstPageUrl}" target="_top" class="btn btn-default btn-sm" title="First page">«</a>
+                    </f:if>
+                    <f:if condition="{prevPageUrl}">
+                        <a href="{prevPageUrl}" target="_top" class="btn btn-default btn-sm">
+                            <core:icon identifier="actions-arrow-left" size="small" /> Previous
+                        </a>
+                    </f:if>
+                    <f:for each="{pageNumbers}" as="pn">
+                        <f:if condition="{pn.type} == 'ellipsis'">
+                            <f:then>
+                                <span class="px-1 text-body-secondary">…</span>
+                            </f:then>
+                            <f:else>
+                                <a href="{pn.url}" target="_top"
+                                   class="btn btn-sm {f:if(condition: pn.active, then: 'btn-primary', else: 'btn-default')}">{pn.page}</a>
+                            </f:else>
+                        </f:if>
+                    </f:for>
+                    <f:if condition="{nextPageUrl}">
+                        <a href="{nextPageUrl}" target="_top" class="btn btn-default btn-sm">
+                            Next <core:icon identifier="actions-arrow-right" size="small" />
+                        </a>
+                    </f:if>
+                    <f:if condition="{lastPageUrl}">
+                        <a href="{lastPageUrl}" target="_top" class="btn btn-default btn-sm" title="Last page">»</a>
+                    </f:if>
+                </div>
+            </div>
+        </f:if>
+
+</f:if><!-- end quarantine view -->
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- LOG VIEW                                                                 -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<f:if condition="{view} == 'log'">
+
+<f:if condition="{logTotal} == 0">
+    <div class="t3-filelist-info-container">
+        <core:icon identifier="actions-clock" size="large" />
+        <h5 class="mt-2">No activity yet</h5>
+        <p>Log entries appear here after files are deleted, quarantined, restored, or skipped.</p>
+    </div>
+</f:if>
+
+<f:if condition="{logTotal} > 0">
+    <div class="row align-items-center mb-2">
+        <div class="col-auto ms-auto">
+            <form method="get" action="{moduleUrl}" class="d-inline" target="_top">
+                <input type="hidden" name="view" value="log" />
+                <label class="text-body-secondary small me-1">Show</label>
+                <select name="perPage" class="form-select form-select-sm d-inline-block" style="width:auto"
+                        onchange="this.form.submit()">
+                    <f:for each="{perPageOptions}" as="opt">
+                        <option value="{opt.value}" <f:if condition="{opt.active}">selected="selected"</f:if>>{opt.value}</option>
+                    </f:for>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-fit">
+        <table class="table table-sm table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Date / Time</th>
+                    <th>Action</th>
+                    <th>File</th>
+                    <th>User</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <f:for each="{logEntries}" as="entry">
+                    <tr>
+                        <td class="text-nowrap">
+                            <small class="text-body-secondary">
+                                <f:format.date format="Y-m-d H:i:s">{entry.created_at}</f:format.date>
+                            </small>
+                        </td>
+                        <td class="text-nowrap">
+                            <f:if condition="{entry.action} == 'delete_direct'">
+                                <f:then><span class="badge bg-danger">deleted</span></f:then>
+                            </f:if>
+                            <f:if condition="{entry.action} == 'quarantine'">
+                                <f:then><span class="badge bg-warning text-dark">quarantined</span></f:then>
+                            </f:if>
+                            <f:if condition="{entry.action} == 'flush'">
+                                <f:then><span class="badge bg-dark">flushed</span></f:then>
+                            </f:if>
+                            <f:if condition="{entry.action} == 'restore'">
+                                <f:then><span class="badge bg-success">restored</span></f:then>
+                            </f:if>
+                            <f:if condition="{entry.action} == 'skip'">
+                                <f:then><span class="badge bg-secondary">skipped</span></f:then>
+                            </f:if>
+                            <f:if condition="{entry.action} == 'recheck'">
+                                <f:then><span class="badge bg-info text-dark">rechecked</span></f:then>
+                            </f:if>
+                        </td>
+                        <td>
+                            <code class="small">{entry.identifier}</code>
+                        </td>
+                        <td class="text-nowrap">
+                            <small>{entry.be_user_name}</small>
+                        </td>
+                        <td>
+                            <f:if condition="{entry.details}">
+                                <small class="text-body-secondary">{entry.details}</small>
+                            </f:if>
+                        </td>
+                    </tr>
+                </f:for>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row align-items-center mt-1 mb-4">
+        <div class="col">
+            <small class="text-body-secondary">Showing {rangeFrom}–{rangeTo} of {logTotal} · Page {currentPage} of {totalPages}</small>
+        </div>
+        <div class="col-auto d-flex align-items-center gap-1">
+            <f:if condition="{firstPageUrl}">
+                <a href="{firstPageUrl}" target="_top" class="btn btn-default btn-sm" title="First page">«</a>
+            </f:if>
+            <f:if condition="{prevPageUrl}">
+                <a href="{prevPageUrl}" target="_top" class="btn btn-default btn-sm">
+                    <core:icon identifier="actions-arrow-left" size="small" /> Previous
+                </a>
+            </f:if>
+            <f:for each="{pageNumbers}" as="pn">
+                <f:if condition="{pn.type} == 'ellipsis'">
+                    <f:then>
+                        <span class="px-1 text-body-secondary">…</span>
+                    </f:then>
+                    <f:else>
+                        <a href="{pn.url}" target="_top"
+                           class="btn btn-sm {f:if(condition: pn.active, then: 'btn-primary', else: 'btn-default')}">{pn.page}</a>
+                    </f:else>
+                </f:if>
+            </f:for>
+            <f:if condition="{nextPageUrl}">
+                <a href="{nextPageUrl}" target="_top" class="btn btn-default btn-sm">
+                    Next <core:icon identifier="actions-arrow-right" size="small" />
+                </a>
+            </f:if>
+            <f:if condition="{lastPageUrl}">
+                <a href="{lastPageUrl}" target="_top" class="btn btn-default btn-sm" title="Last page">»</a>
+            </f:if>
+        </div>
+    </div>
+</f:if>
+
+</f:if><!-- end log view -->
+
+<script>
+(function () {
+    // Auto-navigate to the last folder the user selected in any file module.
+    // The file-storage tree writes the current folder to sessionStorage under
+    // 't3-module-state-media' whenever a node is selected. We read it back on
+    // initial load (no ?id= in URL) so the module opens on the right folder
+    // instead of always defaulting to storage root.
+    if (window.location.search.indexOf('id=') === -1) {
+        try {
+            var raw = sessionStorage.getItem('t3-module-state-media');
+            if (raw) {
+                var state = JSON.parse(raw);
+                var sel = state.selection || state.identifier || '';
+                if (sel) {
+                    sel = decodeURIComponent(sel);
+                    var url = new URL(window.location.href);
+                    url.searchParams.set('id', sel);
+                    window.location.replace(url.toString());
+                }
+            }
+        } catch (e) {}
+    }
+}());
+</script>
+
+<script type="module">
+import Modal from '@typo3/backend/modal.js';
+import { SeverityEnum } from '@typo3/backend/enum/severity.js';
+
+// Select all toggle
+const toggleBtn    = document.getElementById('q-select-all-btn');
+const toggleLabel  = document.getElementById('q-select-label');
+if (toggleBtn && toggleLabel) {
+    const defaultLabel = toggleLabel.textContent;
+    toggleBtn.addEventListener('click', () => {
+        const cbs        = document.querySelectorAll('.q-cb');
+        const allChecked = Array.from(cbs).every(c => c.checked);
+        cbs.forEach(c => { c.checked = !allChecked; });
+        toggleLabel.textContent = allChecked ? defaultLabel : 'Deselect all';
+    });
+}
+
+const perPageSelect = document.getElementById('q-per-page-select');
+if (perPageSelect) {
+    perPageSelect.addEventListener('change', (e) => {
+        const selected = e.target.selectedOptions[0];
+        if (selected && selected.dataset.url) {
+            top.location.href = selected.dataset.url;
+        }
+    });
+}
+
+// Run scan confirm
+const scanBtn = document.getElementById('scan-run-btn');
+if (scanBtn) {
+    scanBtn.addEventListener('click', () => {
+        const modal = Modal.confirm(
+            'Run scan',
+            'Run scan now? This may take a moment.',
+            SeverityEnum.info,
+            [
+                { text: 'Cancel', active: true, btnClass: 'btn-default', name: 'cancel' },
+                { text: 'Run scan', btnClass: 'btn-primary', name: 'ok' },
+            ]
+        );
+        modal.addEventListener('button.clicked', (e) => {
+            modal.hideModal();
+            if (e.target.getAttribute('name') === 'ok') {
+                document.getElementById('scan-run-form').submit();
+            }
+        });
+    });
+}
+
+// Clear queue confirm
+const clearForm = document.getElementById('clear-queue-form');
+if (clearForm) {
+    clearForm.addEventListener('submit', (event) => {
+        if (!window.confirm('Remove ALL records from the queue? Quarantined physical files are NOT deleted.')) {
+            event.preventDefault();
+        }
+    });
+}
+
+// Bulk action confirm
+const applyBtn = document.getElementById('bulk-apply-btn');
+if (applyBtn) {
+    applyBtn.addEventListener('click', () => {
+        const sel     = document.getElementById('bulk-action-select');
+        const action  = sel ? sel.value : '';
+        const checked = document.querySelectorAll('.q-cb:checked').length;
+
+        if (!action) {
+            Modal.show('No action selected', 'Please choose an action from the dropdown.', SeverityEnum.info);
+            return;
+        }
+        if (checked === 0) {
+            Modal.show('No selection', 'No records selected. Check at least one row.', SeverityEnum.info);
+            return;
+        }
+
+        let title    = 'Confirm action';
+        let message  = 'Apply to ' + checked + ' selected record(s)?';
+        let severity = SeverityEnum.warning;
+        let okText   = 'Apply';
+        let okClass  = 'btn-warning';
+
+        if (action === 'delete') {
+            title    = 'Permanently delete';
+            message  = 'Permanently delete ' + checked + ' quarantined file(s) from disk and remove FAL records. This cannot be undone.';
+            severity = SeverityEnum.error;
+            okText   = 'Delete permanently';
+            okClass  = 'btn-danger';
+        } else if (action === 'quarantine') {
+            title   = 'Move to quarantine';
+            message = 'Move ' + checked + ' candidate file(s) to the quarantine folder. Files will not be deleted immediately.';
+            okText  = 'Move to quarantine';
+        }
+
+        const modal = Modal.confirm(title, message, severity, [
+            { text: 'Cancel', active: true, btnClass: 'btn-default', name: 'cancel' },
+            { text: okText, btnClass: okClass, name: 'ok' },
+        ]);
+        modal.addEventListener('button.clicked', (e) => {
+            modal.hideModal();
+            if (e.target.getAttribute('name') === 'ok') {
+                document.getElementById('quarantine-form').submit();
+            }
+        });
+    });
+}
+</script>
+
+</f:section>
+</html>
