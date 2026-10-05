@@ -29,6 +29,7 @@ use TYPO3\CMS\Core\Resource\Exception\FolderDoesNotExistException;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\Index\Indexer;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -44,7 +45,6 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
         private readonly IconFactory $iconFactory,
         private readonly MimeTypeService $mimeTypeService,
         private readonly ResourceFactory $resourceFactory,
-        private readonly ComponentFactory $componentFactory,
         private readonly ListenerProvider $listenerProvider,
     ) {}
 
@@ -58,6 +58,12 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
      */
     private function ensureLabelImportMapListenerRegistered(): void
     {
+        // TYPO3 v14+ only; v12/v13 have no virtual "~labels/" import specifier
+        if (!class_exists(ResolveVirtualJavaScriptImportEvent::class)
+            || !class_exists(\TYPO3\CMS\Backend\Middleware\JavaScriptLabelImportMapEntryResolver::class)
+        ) {
+            return;
+        }
         $this->listenerProvider->addListener(
             ResolveVirtualJavaScriptImportEvent::class,
             \TYPO3\CMS\Backend\Middleware\JavaScriptLabelImportMapEntryResolver::class,
@@ -85,6 +91,18 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
 
         // Normal filelist request — inject scan button JS inline (no token needed; middleware intercepts before CSRF check)
         $folderId = (string)($request->getQueryParams()['id'] ?? '');
+        if ($folderId === '') {
+            // No ?id= (module opened from menu): filelist shows the default storage root
+            try {
+                // TYPO3 v14 removed ResourceFactory::getDefaultStorage(); use StorageRepository there
+                $defaultStorage = method_exists($this->resourceFactory, 'getDefaultStorage')
+                    ? $this->resourceFactory->getDefaultStorage()
+                    : GeneralUtility::makeInstance(StorageRepository::class)->getDefaultStorage();
+                $folderId = (string)$defaultStorage?->getRootLevelFolder()->getCombinedIdentifier();
+            } catch (\Exception) {
+                $folderId = '';
+            }
+        }
         if ($folderId !== '') {
             $scanHref = '/typo3/module/file/list?id=' . rawurlencode($folderId) . '&mimefix_scan=1';
             $this->pageRenderer->addJsInlineCode('filefix-toolbar', $this->buildToolbarScript($scanHref), false, false, true);
@@ -123,7 +141,7 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
         $GLOBALS['TYPO3_REQUEST'] = $request;
 
         $view           = $this->backendViewFactory->create($request, ['anubit/filefix']);
-        $moduleTemplate = new ModuleTemplate(
+        $moduleTemplateArgs = [
             $this->pageRenderer,
             $this->iconFactory,
             $this->uriBuilder,
@@ -131,9 +149,13 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
             $this->flashMessageService,
             $this->extensionConfiguration,
             $view,
-            $this->componentFactory,
-            $request,
-        );
+        ];
+        // TYPO3 v14 added ComponentFactory before $request; v12/v13 do not have it
+        if (class_exists(ComponentFactory::class)) {
+            $moduleTemplateArgs[] = GeneralUtility::makeInstance(ComponentFactory::class);
+        }
+        $moduleTemplateArgs[] = $request;
+        $moduleTemplate = new ModuleTemplate(...$moduleTemplateArgs);
 
         $moduleTemplate->getDocHeaderComponent()->setMetaInformationForResource($folder);
 
@@ -147,7 +169,7 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
                 ->setHref($backUrl)
                 ->setTitle('Back to file list')
                 ->setShowLabelText(true)
-                ->setIcon($this->iconFactory->getIcon('actions-view-list-collapse', IconSize::SMALL)),
+                ->setIcon($this->iconFactory->getIcon('actions-view-list-collapse', class_exists(IconSize::class) ? IconSize::SMALL : 'small')),
             ButtonBar::BUTTON_POSITION_LEFT,
             1
         );
@@ -155,7 +177,7 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
             $buttonBar->makeLinkButton()
                 ->setHref($scanAgainUrl)
                 ->setTitle('Scan again')
-                ->setIcon($this->iconFactory->getIcon('actions-refresh', IconSize::SMALL)),
+                ->setIcon($this->iconFactory->getIcon('actions-refresh', class_exists(IconSize::class) ? IconSize::SMALL : 'small')),
             ButtonBar::BUTTON_POSITION_RIGHT
         );
 
@@ -285,7 +307,9 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
 (function () {
     var inject = function () {
         if (document.getElementById('mimefix-scan-btn')) { return; }
-        var container = document.querySelector('.module-docheader-buttons .module-docheader-column-grow');
+        // v14: .module-docheader-buttons .module-docheader-column-grow, v12/v13: .module-docheader-bar-buttons .module-docheader-bar-column-left
+        var container = document.querySelector('.module-docheader-buttons .module-docheader-column-grow')
+            || document.querySelector('.module-docheader-bar-buttons .module-docheader-bar-column-left');
         if (!container) { return; }
         var toolbar = container.querySelector('.btn-toolbar');
         if (!toolbar) {
@@ -304,8 +328,40 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
         icon.setAttribute('size', 'small');
         btn.appendChild(icon);
         btn.appendChild(document.createTextNode(' Scan MIME'));
+        // Loading overlay (same markup as the File Cleanup module): the scan runs server-side
+        // before any response, without it the file list looks frozen
+        btn.addEventListener('click', function (e) {
+            if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
+            var overlay = document.getElementById('filefix-loading');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'filefix-loading';
+                overlay.className = 'position-fixed top-0 start-0 w-100 h-100 flex-column align-items-center justify-content-center gap-2 bg-body bg-opacity-75';
+                // Inline positioning: TYPO3 v14 backend CSS no longer ships the position/inset/opacity utilities
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1050;background-color:rgba(var(--bs-body-bg-rgb, 255, 255, 255), .75)';
+                var spinner = document.createElement('typo3-backend-icon');
+                spinner.setAttribute('identifier', 'spinner-circle');
+                spinner.setAttribute('size', 'large');
+                var text = document.createElement('span');
+                text.className = 'text-body-secondary';
+                text.textContent = 'Scanning for MIME type mismatches…';
+                overlay.appendChild(spinner);
+                overlay.appendChild(text);
+                document.body.appendChild(overlay);
+            }
+            overlay.classList.remove('d-none');
+            overlay.classList.add('d-flex');
+        });
         toolbar.appendChild(btn);
     };
+    // Back/forward cache restores the page with the overlay still visible
+    window.addEventListener('pageshow', function (e) {
+        var overlay = document.getElementById('filefix-loading');
+        if (e.persisted && overlay) {
+            overlay.classList.add('d-none');
+            overlay.classList.remove('d-flex');
+        }
+    });
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', inject);
     } else {

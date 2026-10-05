@@ -6,6 +6,8 @@ namespace Anubit\Filefix\Service;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Result;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -30,46 +32,47 @@ class FileCleanupService
         string $extension = ''
     ): array {
         $qb = $this->buildUnusedFilesQuery($storageUid, $folderPrefix, $extension);
-        return $qb
+        $qb
             ->select('sf.uid', 'sf.identifier', 'sf.name', 'sf.size', 'sf.mime_type', 'sf.tstamp', 'sf.missing')
             ->orderBy('sf.identifier')
             ->setMaxResults($limit)
-            ->setFirstResult($offset)
-            ->executeQuery()
-            ->fetchAllAssociative();
+            ->setFirstResult($offset);
+        return $this->executeUnusedFilesQuery($qb)->fetchAllAssociative();
     }
 
     public function findAllUnusedFileUids(int $storageUid = 1, string $folderPrefix = '', string $extension = ''): array
     {
         $qb = $this->buildUnusedFilesQuery($storageUid, $folderPrefix, $extension);
-        $rows = $qb->select('sf.uid')->executeQuery()->fetchAllAssociative();
+        $rows = $this->executeUnusedFilesQuery($qb->select('sf.uid'))->fetchAllAssociative();
         return array_column($rows, 'uid');
     }
 
     public function countUnusedFiles(int $storageUid = 1, string $folderPrefix = '', string $extension = ''): int
     {
         $qb = $this->buildUnusedFilesQuery($storageUid, $folderPrefix, $extension);
-        return (int)$qb->count('sf.uid')->executeQuery()->fetchOne();
+        return (int)$this->executeUnusedFilesQuery($qb->count('sf.uid'))->fetchOne();
     }
 
     /**
-     * Returns distinct file extensions (lowercase, sorted) from unused files in the given folder.
+     * Unused file count per extension (lowercase key) in the given folder, in one query.
      * Always runs without extension filter so all available options are returned.
+     *
+     * @return array<string, int>
      */
-    public function getAvailableExtensions(int $storageUid = 1, string $folderPrefix = ''): array
+    public function getUnusedExtensionCounts(int $storageUid = 1, string $folderPrefix = ''): array
     {
         $qb = $this->buildUnusedFilesQuery($storageUid, $folderPrefix);
-        $rows = $qb->select('sf.identifier')->executeQuery()->fetchAllAssociative();
-        $exts = [];
+        $qb->select('sf.extension')
+            ->addSelectLiteral('COUNT(*) AS cnt')
+            ->groupBy('sf.extension');
+        $rows = $this->executeUnusedFilesQuery($qb)->fetchAllAssociative();
+        $counts = [];
         foreach ($rows as $row) {
-            $ext = strtolower(pathinfo((string)$row['identifier'], PATHINFO_EXTENSION));
-            if ($ext !== '') {
-                $exts[$ext] = true;
-            }
+            $ext = strtolower((string)$row['extension']);
+            $counts[$ext] = ($counts[$ext] ?? 0) + (int)$row['cnt'];
         }
-        $exts = array_keys($exts);
-        sort($exts);
-        return $exts;
+        ksort($counts);
+        return $counts;
     }
 
     /**
@@ -207,17 +210,52 @@ class FileCleanupService
         return [$deleted, []];
     }
 
+    /**
+     * Runs a query from buildUnusedFilesQuery(). On MySQL/MariaDB the sys_file indexes are
+     * disabled: all of them start with "storage" (cardinality 1 on typical installs), so
+     * the optimizer's range plan does one random row lookup per sys_file row, measured
+     * about 4x slower than a full table scan.
+     */
+    private function executeUnusedFilesQuery(QueryBuilder $qb): Result
+    {
+        $connection = $this->connectionPool->getConnectionForTable('sys_file');
+        $sql        = $qb->getSQL();
+        if ($connection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            $from = 'FROM ' . $qb->quoteIdentifier('sys_file') . ' ' . $qb->quoteIdentifier('sf');
+            $sql  = str_replace($from, $from . ' USE INDEX ()', $sql);
+        }
+        return $connection->executeQuery($sql, $qb->getParameters(), $qb->getParameterTypes());
+    }
+
     private function buildUnusedFilesQuery(int $storageUid, string $folderPrefix, string $extension = ''): QueryBuilder
     {
         $qb = $this->connectionPool->getQueryBuilderForTable('sys_file');
         $qb->getRestrictions()->removeAll();
 
-        $qb->from('sys_file', 'sf')
-            ->leftJoin('sf', 'sys_file_reference', 'sfr', 'sf.uid = sfr.uid_local AND sfr.deleted = 0')
-            ->leftJoin('sf', 'sys_refindex', 'sri', "sri.ref_table = 'sys_file' AND sri.ref_uid = sf.uid AND sri.softref_key != ''")
+        // Correlated NOT EXISTS for sys_file_reference, uncorrelated NOT IN for sys_refindex:
+        // the NOT IN subquery is materialized once instead of one sys_refindex lookup per sys_file row.
+        $referenceSubQuery = $this->connectionPool->getQueryBuilderForTable('sys_file_reference');
+        $referenceSubQuery->getRestrictions()->removeAll();
+        $referenceSubQuery->select('sfr.uid')
+            ->from('sys_file_reference', 'sfr')
             ->where(
-                $qb->expr()->isNull('sfr.uid'),
-                $qb->expr()->isNull('sri.hash'),
+                $qb->expr()->eq('sfr.uid_local', $qb->quoteIdentifier('sf.uid')),
+                $qb->expr()->eq('sfr.deleted', $qb->createNamedParameter(0, ParameterType::INTEGER))
+            );
+
+        $softReferenceSubQuery = $this->connectionPool->getQueryBuilderForTable('sys_refindex');
+        $softReferenceSubQuery->getRestrictions()->removeAll();
+        $softReferenceSubQuery->select('sri.ref_uid')
+            ->from('sys_refindex', 'sri')
+            ->where(
+                $qb->expr()->eq('sri.ref_table', $qb->createNamedParameter('sys_file')),
+                $qb->expr()->neq('sri.softref_key', $qb->createNamedParameter(''))
+            );
+
+        $qb->from('sys_file', 'sf')
+            ->where(
+                'NOT EXISTS (' . $referenceSubQuery->getSQL() . ')',
+                $qb->quoteIdentifier('sf.uid') . ' NOT IN (' . $softReferenceSubQuery->getSQL() . ')',
                 $qb->expr()->eq('sf.storage', $qb->createNamedParameter($storageUid, ParameterType::INTEGER)),
                 $qb->expr()->eq('sf.missing', $qb->createNamedParameter(0, ParameterType::INTEGER))
             );
@@ -231,8 +269,7 @@ class FileCleanupService
         }
 
         if ($extension !== '') {
-            $escaped = $conn->escapeLikeWildcards(strtolower($extension));
-            $qb->andWhere($qb->expr()->like('sf.identifier', $qb->createNamedParameter('%.' . $escaped)));
+            $qb->andWhere($qb->expr()->eq('sf.extension', $qb->createNamedParameter(strtolower($extension))));
         }
 
         return $qb;

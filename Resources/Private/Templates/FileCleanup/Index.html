@@ -9,6 +9,11 @@
 
 <f:be.pageRenderer includeJavaScriptModules="{0: '@anubit/filefix/file-cleanup.js'}" />
 
+<div id="filefix-loading" class="d-none position-fixed top-0 start-0 w-100 h-100 flex-column align-items-center justify-content-center gap-2 bg-body bg-opacity-75" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:1050;background-color:rgba(var(--bs-body-bg-rgb, 255, 255, 255), .75)">
+    <core:icon identifier="spinner-circle" size="large" />
+    <span class="text-body-secondary">Loading…</span>
+</div>
+
 <h1>File Cleanup</h1>
 
 <f:if condition="{totalUnfiltered} == 0">
@@ -35,13 +40,13 @@
         <div class="col-auto d-flex align-items-center gap-2">
 
             <!-- ── Show filter dropdown ── -->
-            <form method="get" action="{cleanupActionUrl}" target="_top" class="d-inline">
+            <form method="get" action="{cleanupActionUrl}" class="d-inline">
                 <input type="hidden" name="id" value="{folderId}" />
                 <input type="hidden" name="perPage" value="{perPage}" />
                 <input type="hidden" name="ext" value="{extFilter}" />
                 <input type="hidden" name="viewMode" value="{viewMode}" />
                 <select name="show" class="form-select form-select-sm" style="width:auto"
-                        onchange="this.form.submit()">
+                        data-filefix-autosubmit="1">
                     <option value="all"     <f:if condition="{showFilter} == 'all'">selected="selected"</f:if>>All unreferenced</option>
                     <option value="present" <f:if condition="{showFilter} == 'present'">selected="selected"</f:if>>Present on disk</option>
                     <option value="missing" <f:if condition="{showFilter} == 'missing'">selected="selected"</f:if>>Physically missing</option>
@@ -50,13 +55,13 @@
 
             <!-- ── Extension filter dropdown ── -->
             <f:if condition="{availableExtensions}">
-                <form method="get" action="{cleanupActionUrl}" target="_top" class="d-inline">
+                <form method="get" action="{cleanupActionUrl}" class="d-inline">
                     <input type="hidden" name="id" value="{folderId}" />
                     <input type="hidden" name="perPage" value="{perPage}" />
                     <input type="hidden" name="show" value="{showFilter}" />
                     <input type="hidden" name="viewMode" value="{viewMode}" />
                     <select name="ext" class="form-select form-select-sm" style="width:auto"
-                            onchange="this.form.submit()">
+                            data-filefix-autosubmit="1">
                         <option value="" <f:if condition="{extFilter} == ''">selected="selected"</f:if>>All types</option>
                         <f:for each="{availableExtensions}" as="extOption">
                             <option value="{extOption}" <f:if condition="{extFilter} == {extOption}">selected="selected"</f:if>>.{extOption}</option>
@@ -67,24 +72,24 @@
 
             <!-- ── View mode toggle ── -->
             <div class="btn-group" role="group" aria-label="View mode">
-                <a href="{viewListUrl}" target="_top"
+                <a href="{viewListUrl}" data-filefix-view="list"
                    class="btn btn-sm {f:if(condition:'{viewMode} == \'list\'', then:'btn-primary', else:'btn-default')}">
                     <core:icon identifier="actions-viewmode-list" size="small" /> List
                 </a>
-                <a href="{viewThumbsUrl}" target="_top"
+                <a href="{viewThumbsUrl}" data-filefix-view="thumbs"
                    class="btn btn-sm {f:if(condition:'{viewMode} == \'thumbs\'', then:'btn-primary', else:'btn-default')}">
                     <core:icon identifier="actions-viewmode-tiles" size="small" /> Thumbnails
                 </a>
             </div>
 
             <span class="text-body-secondary small">Show</span>
-            <form method="get" action="{cleanupActionUrl}" target="_top" class="d-inline">
+            <form method="get" action="{cleanupActionUrl}" class="d-inline">
                 <input type="hidden" name="id" value="{folderId}" />
                 <input type="hidden" name="show" value="{showFilter}" />
                 <input type="hidden" name="ext" value="{extFilter}" />
                 <input type="hidden" name="viewMode" value="{viewMode}" />
                 <select name="perPage" class="form-select form-select-sm" style="width:auto"
-                        onchange="this.form.submit()">
+                        data-filefix-autosubmit="1">
                     <f:for each="{perPageOptions}" as="opt">
                         <option value="{opt.value}"
                             <f:if condition="{opt.active}">selected="selected"</f:if>>{opt.value}</option>
@@ -140,8 +145,9 @@
             </div>
         </div>
 
-        <f:if condition="{viewMode} == 'thumbs'">
-            <f:then>
+        <!-- Both views are rendered; file-cleanup.js switches between them without a reload.
+             Checkboxes in the hidden view are disabled so file_uids[] is submitted only once. -->
+        <div data-filefix-view-panel="thumbs" class="{f:if(condition:'{viewMode} != \'thumbs\'', then:'d-none')}">
                 <div class="row row-cols-auto g-3 filefix-cleanup-thumbs">
                     <f:if condition="{unusedCount} == 0">
                         <div class="col text-body-secondary">No files match the current filter.</div>
@@ -164,7 +170,8 @@
                                 <div class="card-body p-2">
                                     <div class="d-flex align-items-start gap-1">
                                         <input type="checkbox" name="file_uids[]"
-                                            value="{file.uid}" class="cleanup-checkbox cleanup-unused mt-1" />
+                                            value="{file.uid}" class="cleanup-checkbox cleanup-unused mt-1"
+                                            {f:if(condition:'{viewMode} != \'thumbs\'', then:'disabled="disabled"')} />
                                         <div class="small text-truncate" title="{file.identifier}">{file.name}</div>
                                     </div>
                                     <f:if condition="{file.physicallyMissing}">
@@ -178,8 +185,8 @@
                         </div>
                     </f:for>
                 </div>
-            </f:then>
-            <f:else>
+        </div>
+        <div data-filefix-view-panel="list" class="{f:if(condition:'{viewMode} == \'thumbs\'', then:'d-none')}">
                 <div class="table-fit">
                     <table class="table table-striped table-hover">
                         <thead>
@@ -202,7 +209,8 @@
                                 <tr>
                                     <td class="col-checkbox">
                                         <input type="checkbox" name="file_uids[]"
-                                            value="{file.uid}" class="cleanup-checkbox cleanup-unused" />
+                                            value="{file.uid}" class="cleanup-checkbox cleanup-unused"
+                                            {f:if(condition:'{viewMode} == \'thumbs\'', then:'disabled="disabled"')} />
                                     </td>
                                     <td>
                                         <f:if condition="{file.physicallyMissing}">
@@ -236,8 +244,7 @@
                         </tbody>
                     </table>
                 </div>
-            </f:else>
-        </f:if>
+        </div>
     </form>
 
     <!-- Pagination -->
@@ -247,13 +254,13 @@
         </div>
         <div class="col-auto d-flex align-items-center gap-2">
             <f:if condition="{prevPageUrl}">
-                <a href="{prevPageUrl}" target="_top" class="btn btn-default btn-sm">
+                <a href="{prevPageUrl}" class="btn btn-default btn-sm">
                     <core:icon identifier="actions-arrow-left" size="small" /> Previous
                 </a>
             </f:if>
             <span class="text-body-secondary small">Page {currentPage} of {totalPages}</span>
             <f:if condition="{nextPageUrl}">
-                <a href="{nextPageUrl}" target="_top" class="btn btn-default btn-sm">
+                <a href="{nextPageUrl}" class="btn btn-default btn-sm">
                     Next <core:icon identifier="actions-arrow-right" size="small" />
                 </a>
             </f:if>

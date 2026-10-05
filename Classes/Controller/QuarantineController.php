@@ -87,7 +87,7 @@ class QuarantineController
                     ->setHref((string)$this->uriBuilder->buildUriFromRoute(self::ROUTE, $baseParams))
                     ->setTitle('Refresh')
                     ->setShowLabelText(true)
-                    ->setIcon($this->iconFactory->getIcon('actions-refresh', IconSize::SMALL)),
+                    ->setIcon($this->iconFactory->getIcon('actions-refresh', class_exists(IconSize::class) ? IconSize::SMALL : 'small')),
                 ButtonBar::BUTTON_POSITION_RIGHT
             );
 
@@ -208,7 +208,7 @@ class QuarantineController
                 ->setHref((string)$this->uriBuilder->buildUriFromRoute(self::ROUTE, $baseParams))
                 ->setTitle('Refresh')
                 ->setShowLabelText(true)
-                ->setIcon($this->iconFactory->getIcon('actions-refresh', IconSize::SMALL)),
+                ->setIcon($this->iconFactory->getIcon('actions-refresh', class_exists(IconSize::class) ? IconSize::SMALL : 'small')),
             ButtonBar::BUTTON_POSITION_RIGHT
         );
 

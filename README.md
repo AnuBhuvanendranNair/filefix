@@ -2,7 +2,7 @@
 
 **Find it. Fix it. Never `rm -rf` a client's fileadmin by accident.**
 
-A TYPO3 v14 backend extension that keeps `fileadmin` honest: it catches files whose content doesn't match their extension, finds files nobody references anymore, and gives you a safe, reversible way to get rid of them — instead of a one-way delete button and a prayer.
+A TYPO3 backend extension that keeps `fileadmin` honest: it catches files whose content doesn't match their extension, finds files nobody references anymore, and gives you a safe, reversible way to get rid of them — instead of a one-way delete button and a prayer.
 
 ---
 

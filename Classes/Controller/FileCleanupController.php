@@ -63,16 +63,17 @@ class FileCleanupController
         $storageBasePath   = $this->fileCleanupService->getStorageBasePath();
         $storagePublicBase = $this->fileCleanupService->getStoragePublicBase();
 
-        $availableExtensions = $this->fileCleanupService->getAvailableExtensions(1, $folderPrefix);
-
-        // Unfiltered total — used only to decide whether to show the "all clean" state.
+        // One query for extension list, unfiltered total and per-extension total.
+        // Unfiltered total is used only to decide whether to show the "all clean" state.
         // Must stay independent of $showFilter/$extFilter so the filter/delete controls
         // don't disappear just because the current filter happens to match zero files.
-        $totalUnfiltered = $this->fileCleanupService->countUnusedFiles(1, $folderPrefix, '');
+        $extensionCounts     = $this->fileCleanupService->getUnusedExtensionCounts(1, $folderPrefix);
+        $availableExtensions = array_values(array_filter(array_keys($extensionCounts), static fn($ext) => $ext !== ''));
+        $totalUnfiltered     = array_sum($extensionCounts);
 
         if ($showFilter === 'all') {
             // Fast path: paginate entirely in the DB query
-            $totalUnused = $this->fileCleanupService->countUnusedFiles(1, $folderPrefix, $extFilter);
+            $totalUnused = $extFilter === '' ? $totalUnfiltered : ($extensionCounts[$extFilter] ?? 0);
             $totalPages  = max(1, (int)ceil($totalUnused / $perPage));
             $page        = min($page, $totalPages);
             $offset      = ($page - 1) * $perPage;
@@ -106,12 +107,11 @@ class FileCleanupController
             $unusedFiles = array_slice($all, $offset, $perPage);
         }
 
-        if ($viewMode === 'thumbs') {
-            $unusedFiles = array_map(
-                fn(array $file): array => $file + ['thumbnailUrl' => $this->getThumbnailUrl($file)],
-                $unusedFiles
-            );
-        }
+        // Always resolved: the template renders list and thumbnail view, the toggle is client-side
+        $unusedFiles = array_map(
+            fn(array $file): array => $file + ['thumbnailUrl' => $this->getThumbnailUrl($file)],
+            $unusedFiles
+        );
 
         $baseParams = ['perPage' => $perPage, 'show' => $showFilter, 'ext' => $extFilter, 'viewMode' => $viewMode];
         if ($folderId !== '') {
@@ -140,7 +140,7 @@ class FileCleanupController
                 ->setHref((string)$this->uriBuilder->buildUriFromRoute('filefix_cleanup', $baseParams))
                 ->setTitle('Refresh')
                 ->setShowLabelText(true)
-                ->setIcon($this->iconFactory->getIcon('actions-refresh', IconSize::SMALL)),
+                ->setIcon($this->iconFactory->getIcon('actions-refresh', class_exists(IconSize::class) ? IconSize::SMALL : 'small')),
             ButtonBar::BUTTON_POSITION_RIGHT
         );
 

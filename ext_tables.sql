@@ -53,3 +53,11 @@ CREATE TABLE tx_filefix_log (
     KEY created_at_idx (created_at),
     KEY action_idx (action)
 );
+
+#
+# sys_refindex — covering index for the unused-files soft reference lookup
+# (ref_table = 'sys_file' AND softref_key != ''), avoids full scan of sys_refindex
+#
+CREATE TABLE sys_refindex (
+    KEY filefix_softref (ref_table, softref_key, ref_uid)
+);
