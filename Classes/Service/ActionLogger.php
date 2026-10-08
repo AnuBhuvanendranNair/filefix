@@ -14,6 +14,8 @@ class ActionLogger
     public const ACTION_RESTORE       = 'restore';
     public const ACTION_SKIP          = 'skip';
     public const ACTION_RECHECK       = 'recheck';
+    // Deleted from the duplicate report after a passed deep check
+    public const ACTION_DELETE_DUPLICATE = 'delete_duplicate';
 
     public function __construct(
         private readonly ConnectionPool $connectionPool,

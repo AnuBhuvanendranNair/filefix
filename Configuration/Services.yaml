@@ -6,11 +6,22 @@ services:
 
   Anubit\Filefix\:
     resource: '../Classes/*'
+    # Dashboard data providers depend on EXT:dashboard (optional), registered in Services.php
+    exclude: '../Classes/Widgets/*'
 
   Anubit\Filefix\Controller\FileCleanupController:
     public: true
 
   Anubit\Filefix\Controller\QuarantineController:
+    public: true
+
+  Anubit\Filefix\Controller\DuplicatesController:
+    public: true
+
+  Anubit\Filefix\Controller\OversizedController:
+    public: true
+
+  Anubit\Filefix\Controller\ThumbnailController:
     public: true
 
   Anubit\Filefix\Command\ScanCleanupCandidatesCommand:
@@ -26,3 +37,10 @@ services:
         command: 'filefix:cleanup:flush'
         description: 'Process queued cleanup candidates: move to quarantine or permanently delete quarantined files'
         schedulable: false
+
+  Anubit\Filefix\Command\UpdateFileStatisticsCommand:
+    tags:
+      - name: console.command
+        command: 'filefix:stats:update'
+        description: 'Rebuild the unused-file statistics shown in the filefix dashboard widgets'
+        schedulable: true

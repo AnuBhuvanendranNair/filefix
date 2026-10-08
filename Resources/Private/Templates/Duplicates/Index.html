@@ -1,0 +1,234 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+<f:layout name="Module" />
+
+<f:section name="Content">
+
+<f:if condition="{accessDenied}">
+    <f:then>
+        <h1><f:translate key="dup.title" extensionName="Filefix" /></h1>
+        <div class="alert alert-warning"><f:translate key="dup.adminOnly" extensionName="Filefix" /></div>
+    </f:then>
+    <f:else>
+
+<f:be.pageRenderer
+    includeJavaScriptModules="{0: '@anubit/filefix/duplicates.js'}"
+    includeCssFiles="{0: 'EXT:filefix/Resources/Public/Css/duplicates.css'}"
+/>
+
+<f:comment>Edit icon markup for links built by duplicates.js (deep check results)</f:comment>
+<f:comment>Translated labels for the JavaScript modules</f:comment>
+<div id="filefix-labels" hidden="hidden" data-labels="{jsLabels -> f:format.json()}"></div>
+<template id="filefix-edit-icon"><core:icon identifier="actions-open" size="small" /></template>
+
+<div id="filefix-loading" class="d-none position-fixed top-0 start-0 w-100 h-100 flex-column align-items-center justify-content-center gap-2 bg-body bg-opacity-75" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:1050;background-color:rgba(var(--bs-body-bg-rgb, 255, 255, 255), .75)">
+    <core:icon identifier="spinner-circle" size="large" />
+    <span class="text-body-secondary filefix-loading-text"><f:translate key="common.loading" extensionName="Filefix" /></span>
+</div>
+
+<h1>
+    <f:translate key="dup.title" extensionName="Filefix" />
+    <small class="text-body-secondary fs-6 fw-normal ms-2">
+        <f:translate key="dup.subtitle" extensionName="Filefix" arguments="{0: totalGroups}" /><f:if condition="{folderName} != ''"> <f:translate key="dup.withCopyIn" extensionName="Filefix" /> <strong>{folderName}</strong></f:if>
+        <f:if condition="{totalWasted}"> · <f:translate key="dup.inExtraCopies" extensionName="Filefix" arguments="{0: '{totalWasted -> f:format.bytes(decimals: 1)}'}" /></f:if>
+    </small>
+</h1>
+
+<p class="text-body-secondary small">
+    <f:translate key="dup.note.compare" extensionName="Filefix" />
+    <f:if condition="{recordsNotOnDisk}"><f:translate key="dup.note.notOnDisk" extensionName="Filefix" arguments="{0: recordsNotOnDisk}" /></f:if>
+    <f:translate key="dup.note.readOnly" extensionName="Filefix" />
+    <core:icon identifier="actions-star" size="small" /> <f:translate key="dup.note.keeper" extensionName="Filefix" />
+</p>
+
+<f:if condition="{totalGroups} == 0">
+    <f:then>
+        <div class="t3-filelist-info-container">
+            <core:icon identifier="actions-check" size="large" />
+            <h5 class="mt-2"><f:translate key="dup.empty.title" extensionName="Filefix" /></h5>
+            <p><f:if condition="{folderName} != ''"><f:then><f:translate key="dup.empty.textFolder" extensionName="Filefix" arguments="{0: folderName}" /></f:then><f:else><f:translate key="dup.empty.text" extensionName="Filefix" /></f:else></f:if></p>
+        </div>
+    </f:then>
+    <f:else>
+        <f:for each="{groups}" as="group">
+            <details class="card mb-2 filefix-dup-group">
+                <summary class="card-header filefix-dup-summary">
+                    <span class="filefix-dup-chevron"><core:icon identifier="actions-chevron-right" size="small" /></span>
+                    <span class="filefix-dup-thumb">
+                        <f:if condition="{group.thumbnailUrl}">
+                            <f:then><img src="{group.thumbnailUrl}" alt="" loading="lazy" /></f:then>
+                            <f:else><core:icon identifier="mimetypes-other-other" size="medium" /></f:else>
+                        </f:if>
+                    </span>
+                    <div class="filefix-dup-main">
+                        <strong>{group.copiesList.0.name}</strong>
+                        <div class="small text-body-secondary">
+                            <f:translate key="dup.group.copies" extensionName="Filefix" arguments="{0: group.copies}" /> · <f:translate key="dup.group.each" extensionName="Filefix" arguments="{0: '{group.size -> f:format.bytes(decimals: 1)}'}" /> ·
+                            <strong><f:format.bytes decimals="1">{group.wasted}</f:format.bytes></strong> <f:translate key="dup.group.extra" extensionName="Filefix" /> ·
+                            <f:translate key="dup.group.used" extensionName="Filefix" arguments="{0: group.usedCopies, 1: group.copies}" /> · <f:translate key="dup.group.usages" extensionName="Filefix" arguments="{0: group.referenceTotal}" />
+                        </div>
+                    </div>
+                    <div class="filefix-dup-badges">
+                        <f:if condition="{group.usedCopies} <= 1">
+                            <span class="badge badge-success" title="{f:translate(key: 'dup.badge.easy.title', extensionName: 'Filefix')}"><f:translate key="dup.badge.easy" extensionName="Filefix" /></span>
+                        </f:if>
+                        <f:if condition="{group.usedCopies} > 1">
+                            <span class="badge badge-info" title="{f:translate(key: 'dup.badge.severalUsed.title', extensionName: 'Filefix')}"><f:translate key="dup.badge.severalUsed" extensionName="Filefix" /></span>
+                        </f:if>
+                        <f:if condition="{group.metadataDiffers}">
+                            <span class="badge badge-warning" title="{f:translate(key: 'dup.badge.metadataDiffers.title', extensionName: 'Filefix')}"><f:translate key="dup.badge.metadataDiffers" extensionName="Filefix" /></span>
+                        </f:if>
+                        <f:if condition="{group.hasSoftRefs}">
+                            <span class="badge badge-danger" title="{f:translate(key: 'dup.badge.textLinks.title', extensionName: 'Filefix')}"><f:translate key="dup.badge.textLinks" extensionName="Filefix" /></span>
+                        </f:if>
+                    </div>
+                </summary>
+                <div class="card-body p-0">
+                    <div class="table-fit mb-0">
+                        <table class="table table-hover mb-0 filefix-dup-table">
+                            <thead>
+                                <tr>
+                                    <th class="filefix-dup-keeper"></th>
+                                    <th><f:translate key="common.path" extensionName="Filefix" /></th>
+                                    <th><f:translate key="common.usages" extensionName="Filefix" /></th>
+                                    <th><f:translate key="dup.col.metadata" extensionName="Filefix" /></th>
+                                    <th><f:translate key="dup.col.created" extensionName="Filefix" /></th>
+                                    <th class="filefix-dup-actions"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <f:for each="{group.copiesList}" as="copy">
+                                    <tr>
+                                        <td class="filefix-dup-keeper">
+                                            <f:if condition="{copy.isKeeper}"><span title="{f:translate(key: 'dup.keeper', extensionName: 'Filefix')}"><core:icon identifier="actions-star" size="small" /></span></f:if>
+                                        </td>
+                                        <td>
+                                            <a href="{storagePublicBase}{copy.identifier}" target="_blank" rel="noopener"><code class="small">{copy.identifier}</code></a>
+                                            <f:if condition="{copy.records} > 1"><span class="badge badge-warning" title="{f:translate(key: 'dup.indexed.title', extensionName: 'Filefix', arguments: {0: copy.records})}"><f:translate key="dup.indexed" extensionName="Filefix" arguments="{0: copy.records}" /></span></f:if>
+                                        </td>
+                                        <td class="text-nowrap">
+                                            <f:if condition="{copy.referenceCount} == 0 && {copy.softReferences} == 0">
+                                                <f:then><span class="badge badge-default" title="{f:translate(key: 'dup.noReferences.title', extensionName: 'Filefix')}"><f:translate key="dup.noReferences" extensionName="Filefix" /></span></f:then>
+                                                <f:else>
+                                                    <f:if condition="{copy.referenceCount}">
+                                                        <f:then>
+                                                            <button type="button" class="btn btn-link btn-sm filefix-dup-usages"
+                                                                    data-filefix-usages="filefix-usages-{copy.uid}"
+                                                                    data-filefix-title="{f:translate(key: 'dup.usagesOf', extensionName: 'Filefix', arguments: {0: copy.identifier})}"
+                                                                    title="{f:translate(key: 'dup.showUsages', extensionName: 'Filefix')}">{copy.referenceCount}</button>
+                                                        </f:then>
+                                                        <f:else>0</f:else>
+                                                    </f:if>
+                                                    <f:if condition="{copy.softReferences}"><span class="text-body-secondary small"> <f:translate key="dup.textLinks" extensionName="Filefix" arguments="{0: copy.softReferences}" /></span></f:if>
+                                                    <f:render section="UsagesTemplate" arguments="{copy: copy}" />
+                                                </f:else>
+                                            </f:if>
+                                        </td>
+                                        <td class="small">
+                                            <f:if condition="{copy.hasMetadata}">
+                                                <f:then>
+                                                    <f:if condition="{copy.metadata.title}"><div><span class="text-body-secondary"><f:translate key="dup.meta.title" extensionName="Filefix" /></span> {copy.metadata.title}</div></f:if>
+                                                    <f:if condition="{copy.metadata.alternative}"><div><span class="text-body-secondary"><f:translate key="dup.meta.alt" extensionName="Filefix" /></span> {copy.metadata.alternative}</div></f:if>
+                                                    <f:if condition="{copy.metadata.description}"><div><span class="text-body-secondary"><f:translate key="dup.meta.description" extensionName="Filefix" /></span> <f:format.crop maxCharacters="80">{copy.metadata.description}</f:format.crop></div></f:if>
+                                                </f:then>
+                                                <f:else><span class="text-body-secondary">–</span></f:else>
+                                            </f:if>
+                                        </td>
+                                        <td class="text-nowrap small"><f:if condition="{copy.crdate}"><f:format.date format="Y-m-d">{copy.crdate}</f:format.date></f:if></td>
+                                        <td class="filefix-dup-actions">
+                                            <div class="btn-group">
+                                                <f:if condition="{copy.metadataEditUrl}">
+                                                    <a href="{copy.metadataEditUrl}" class="btn btn-default btn-sm" title="{f:translate(key: 'dup.editMetadata', extensionName: 'Filefix')}">
+                                                        <core:icon identifier="actions-open" size="small" />
+                                                    </a>
+                                                </f:if>
+                                                <button type="button" class="btn btn-default btn-sm"
+                                                        data-filefix-deepcheck="{copy.deepCheckUrl}"
+                                                        data-filefix-delete="{copy.deleteUrl}"
+                                                        data-filefix-file="{copy.uid}"
+                                                        data-filefix-title="{f:translate(key: 'dup.deepCheck.modalTitle', extensionName: 'Filefix', arguments: {0: copy.identifier})}"
+                                                        title="{f:translate(key: 'dup.deepCheck.buttonTitle', extensionName: 'Filefix')}">
+                                                    <core:icon identifier="actions-search" size="small" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </f:for>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </details>
+        </f:for>
+
+        <div class="row align-items-center mt-2 mb-4">
+            <div class="col">
+                <small class="text-body-secondary"><f:translate key="dup.showing" extensionName="Filefix" arguments="{0: rangeFrom, 1: rangeTo, 2: totalGroups}" /></small>
+            </div>
+            <div class="col-auto d-flex align-items-center gap-2">
+                <f:if condition="{prevPageUrl}">
+                    <a href="{prevPageUrl}" class="btn btn-default btn-sm"><core:icon identifier="actions-arrow-left" size="small" /> <f:translate key="common.previous" extensionName="Filefix" /></a>
+                </f:if>
+                <span class="text-body-secondary small"><f:translate key="common.pageOf" extensionName="Filefix" arguments="{0: currentPage, 1: totalPages}" /></span>
+                <f:if condition="{nextPageUrl}">
+                    <a href="{nextPageUrl}" class="btn btn-default btn-sm"><f:translate key="common.next" extensionName="Filefix" /> <core:icon identifier="actions-arrow-right" size="small" /></a>
+                </f:if>
+            </div>
+        </div>
+    </f:else>
+</f:if>
+
+    </f:else>
+</f:if>
+
+</f:section>
+
+<f:comment>Result of the deep check is rendered by duplicates.js into the modal</f:comment>
+<f:section name="UsagesTemplate">
+    <template id="filefix-usages-{copy.uid}">
+        <div class="table-fit mb-0">
+            <table class="table table-hover table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th><f:translate key="dup.usages.record" extensionName="Filefix" /></th>
+                        <th><f:translate key="dup.usages.page" extensionName="Filefix" /></th>
+                        <th><f:translate key="dup.usages.field" extensionName="Filefix" /></th>
+                        <th><f:translate key="dup.usages.ownText" extensionName="Filefix" /></th>
+                        <th><f:translate key="dup.usages.state" extensionName="Filefix" /></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <f:for each="{copy.references}" as="reference">
+                        <tr>
+                            <td>
+                                <span class="text-body-secondary">{reference.tableLabel}:</span>
+                                <f:if condition="{reference.editUrl}">
+                                    <f:then><a href="{reference.editUrl}" data-filefix-edit="1" title="{f:translate(key: 'common.editRecord', extensionName: 'Filefix')}"><core:icon identifier="actions-open" size="small" /> <f:format.crop maxCharacters="70">{reference.recordTitle}</f:format.crop></a></f:then>
+                                    <f:else><f:format.crop maxCharacters="70">{reference.recordTitle}</f:format.crop></f:else>
+                                </f:if>
+                                <span class="text-body-secondary">[{reference.recordUid}]</span>
+                            </td>
+                            <td><f:if condition="{reference.pageUid}">{reference.pageTitle} <span class="text-body-secondary">[{reference.pageUid}]</span></f:if></td>
+                            <td><code>{reference.field}</code></td>
+                            <td>
+                                <f:if condition="{reference.ownAlternative}"><span class="badge badge-info"><f:translate key="dup.usages.alt" extensionName="Filefix" /></span></f:if>
+                                <f:if condition="{reference.ownTitle}"><span class="badge badge-info"><f:translate key="dup.usages.title" extensionName="Filefix" /></span></f:if>
+                                <f:if condition="{reference.ownDescription}"><span class="badge badge-info"><f:translate key="dup.usages.description" extensionName="Filefix" /></span></f:if>
+                            </td>
+                            <td>
+                                <f:if condition="{reference.hidden}"><span class="badge badge-default"><f:translate key="common.hidden" extensionName="Filefix" /></span></f:if>
+                                <f:if condition="{reference.language}"><span class="badge badge-default"><f:translate key="common.lang" extensionName="Filefix" arguments="{0: reference.language}" /></span></f:if>
+                                <f:if condition="{reference.workspace}"><span class="badge badge-warning"><f:translate key="common.workspace" extensionName="Filefix" arguments="{0: reference.workspace}" /></span></f:if>
+                                <f:if condition="!{reference.recordExists}"><span class="badge badge-danger"><f:translate key="dup.usages.recordMissing" extensionName="Filefix" /></span></f:if>
+                            </td>
+                        </tr>
+                    </f:for>
+                </tbody>
+            </table>
+        </div>
+    </template>
+</f:section>
+</html>

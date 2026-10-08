@@ -1,0 +1,7 @@
+# customcategory=images=LLL:EXT:filefix/Resources/Private/Language/locallang_em.xlf:category.images
+
+# cat=images/dims/10; type=int+; label=LLL:EXT:filefix/Resources/Private/Language/locallang_em.xlf:imageMaxWidth
+imageMaxWidth = 1900
+
+# cat=images/dims/20; type=int+; label=LLL:EXT:filefix/Resources/Private/Language/locallang_em.xlf:imageMaxHeight
+imageMaxHeight = 1900

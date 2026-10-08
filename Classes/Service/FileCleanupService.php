@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Anubit\Filefix\Service;
 
+use Anubit\Filefix\Utility\Labels;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
@@ -73,6 +74,61 @@ class FileCleanupService
         }
         ksort($counts);
         return $counts;
+    }
+
+    /**
+     * Space that deleting unused files would really free, per extension (lowercase key):
+     * each physical file counted once (several sys_file records can point to the same path),
+     * only when all its records are unused, only when it exists on disk, size taken from disk.
+     * sys_file.missing / sys_file.size are not trusted (stale in copied or broken installations).
+     *
+     * @return array{byExtension: array<string, array{count: int, bytes: int}>, notOnDisk: int, usedViaOtherRecord: int}
+     */
+    public function getUnusedPhysicalStats(int $storageUid = 1): array
+    {
+        $basePath = $this->getStorageBasePath($storageUid);
+        $connection = $this->connectionPool->getConnectionForTable('sys_file');
+
+        // Paths with more than one record: a path is only reclaimable when all of its records are unused
+        $recordsPerPath = [];
+        $result = $connection->executeQuery(
+            'SELECT identifier_hash, COUNT(*) AS cnt FROM sys_file WHERE storage = ? GROUP BY identifier_hash HAVING COUNT(*) > 1',
+            [$storageUid],
+            [ParameterType::INTEGER]
+        );
+        while ($row = $result->fetchAssociative()) {
+            $recordsPerPath[$row['identifier_hash']] = (int)$row['cnt'];
+        }
+
+        // Unused records, grouped by physical path
+        $qb = $this->buildUnusedFilesQuery($storageUid, '');
+        $qb->select('sf.identifier', 'sf.identifier_hash', 'sf.extension');
+        $unusedPaths = [];
+        $result = $this->executeUnusedFilesQuery($qb);
+        while ($row = $result->fetchAssociative()) {
+            $hash = (string)$row['identifier_hash'];
+            if (!isset($unusedPaths[$hash])) {
+                $unusedPaths[$hash] = ['identifier' => (string)$row['identifier'], 'extension' => strtolower((string)$row['extension']), 'records' => 0];
+            }
+            $unusedPaths[$hash]['records']++;
+        }
+
+        $stats = ['byExtension' => [], 'notOnDisk' => 0, 'usedViaOtherRecord' => 0];
+        foreach ($unusedPaths as $hash => $path) {
+            if (($recordsPerPath[$hash] ?? 1) > $path['records']) {
+                $stats['usedViaOtherRecord']++;
+                continue;
+            }
+            $absolutePath = $basePath . $path['identifier'];
+            if (!is_file($absolutePath)) {
+                $stats['notOnDisk']++;
+                continue;
+            }
+            $ext = $path['extension'];
+            $stats['byExtension'][$ext]['count'] = ($stats['byExtension'][$ext]['count'] ?? 0) + 1;
+            $stats['byExtension'][$ext]['bytes'] = ($stats['byExtension'][$ext]['bytes'] ?? 0) + (int)filesize($absolutePath);
+        }
+        return $stats;
     }
 
     /**
@@ -167,12 +223,12 @@ class FileCleanupService
             $realFile     = realpath($absolutePath);
 
             if ($realFile && $realBase && !str_starts_with($realFile, $realBase . DIRECTORY_SEPARATOR)) {
-                $errors[] = $file['identifier'] . ': path rejected (security check)';
+                $errors[] = Labels::get('clean.error.pathRejected', (string)$file['identifier']);
                 continue;
             }
 
             if ($realFile && is_file($realFile) && !unlink($realFile)) {
-                $errors[] = basename((string)$file['identifier']) . ': could not delete file';
+                $errors[] = Labels::get('clean.error.couldNotDelete', basename((string)$file['identifier']));
                 continue;
             }
 

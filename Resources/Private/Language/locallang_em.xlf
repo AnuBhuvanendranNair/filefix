@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="messages" date="2026-10-07T00:00:00Z" product-name="filefix">
+        <header/>
+        <body>
+            <trans-unit id="category.images">
+                <source>Images</source>
+            </trans-unit>
+            <trans-unit id="imageMaxWidth">
+                <source>Maximum width (px): Images wider than this are reported as oversized (and later resized to fit, aspect ratio kept)</source>
+            </trans-unit>
+            <trans-unit id="imageMaxHeight">
+                <source>Maximum height (px): Images higher than this are reported as oversized (and later resized to fit, aspect ratio kept)</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

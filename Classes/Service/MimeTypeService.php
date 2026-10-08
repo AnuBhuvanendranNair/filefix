@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Anubit\Filefix\Service;
 
+use Anubit\Filefix\Utility\Labels;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -246,7 +247,7 @@ class MimeTypeService
         $extension    = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
         $expectedMime = self::MIME_EXTENSION_MAP[$extension] ?? null;
         if ($expectedMime === null) {
-            return [false, 'Unsupported extension or MIME type.'];
+            return [false, Labels::get('mime.error.unsupported')];
         }
 
         // Text-only extensions need no content conversion — caller handles DB update.
@@ -255,7 +256,7 @@ class MimeTypeService
         }
 
         if (!isset(self::MIME_TO_IM_PREFIX[$expectedMime])) {
-            return [false, 'Unsupported extension or MIME type.'];
+            return [false, Labels::get('mime.error.unsupported')];
         }
 
         $gfx      = $GLOBALS['TYPO3_CONF_VARS']['GFX'] ?? [];
@@ -308,6 +309,6 @@ class MimeTypeService
         }
 
         $detail = implode(' | ', array_filter($output));
-        return [false, $detail ?: 'Unknown error (exit code ' . $returnCode . ')'];
+        return [false, $detail ?: Labels::get('mime.error.exitCode', $returnCode)];
     }
 }

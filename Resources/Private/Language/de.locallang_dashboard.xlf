@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="de" datatype="plaintext" original="messages" date="2026-10-05T00:00:00Z" product-name="filefix">
+        <header/>
+        <body>
+            <trans-unit id="widgetGroup.filefix">
+                <source>File housekeeping</source>
+                <target>Dateipflege</target>
+            </trans-unit>
+            <trans-unit id="widget.unusedFilesByType.title">
+                <source>Unused files by type</source>
+                <target>Unbenutzte Dateien nach Typ</target>
+            </trans-unit>
+            <trans-unit id="widget.unusedFilesByType.description">
+                <source>Number of files without any reference, grouped by file type (default storage)</source>
+                <target>Anzahl der Dateien ohne Referenz, gruppiert nach Dateityp (Standard-Speicher)</target>
+            </trans-unit>
+            <trans-unit id="widget.unusedSpaceByType.title">
+                <source>Unused space by type</source>
+                <target>Unbenutzter Speicher nach Typ</target>
+            </trans-unit>
+            <trans-unit id="widget.unusedSpaceByType.description">
+                <source>Disk space used by files without any reference, grouped by file type (default storage)</source>
+                <target>Speicherplatz der Dateien ohne Referenz, gruppiert nach Dateityp (Standard-Speicher)</target>
+            </trans-unit>
+            <trans-unit id="widget.unusedFilesCount.title">
+                <source>Unused files</source>
+                <target>Unbenutzte Dateien</target>
+            </trans-unit>
+            <trans-unit id="widget.unusedFilesCount.text">
+                <source>files without any reference</source>
+                <target>Dateien ohne Referenz</target>
+            </trans-unit>
+            <trans-unit id="widget.unusedFilesCount.description">
+                <source>Total number of files without any reference in the default storage</source>
+                <target>Gesamtzahl der Dateien ohne Referenz im Standard-Speicher</target>
+            </trans-unit>
+            <trans-unit id="widget.reclaimableSpace.title">
+                <source>Reclaimable space</source>
+                <target>Freigebbarer Speicherplatz</target>
+            </trans-unit>
+            <trans-unit id="widget.reclaimableSpace.text">
+                <source>used by unreferenced files</source>
+                <target>belegt durch nicht referenzierte Dateien</target>
+            </trans-unit>
+            <trans-unit id="widget.reclaimableSpace.description">
+                <source>Disk space that could be freed by removing unreferenced files</source>
+                <target>Speicherplatz, der durch Entfernen nicht referenzierter Dateien frei würde</target>
+            </trans-unit>
+            <trans-unit id="chart.total">
+                <source>Total: %s</source>
+                <target>Gesamt: %s</target>
+            </trans-unit>
+            <trans-unit id="chart.files">
+                <source>%s files</source>
+                <target>%s Dateien</target>
+            </trans-unit>
+            <trans-unit id="chart.other">
+                <source>other</source>
+                <target>sonstige</target>
+            </trans-unit>
+            <trans-unit id="chart.noExtension">
+                <source>(none)</source>
+                <target>(ohne)</target>
+            </trans-unit>
+            <trans-unit id="format.decimalSeparator">
+                <source>.</source>
+                <target>,</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

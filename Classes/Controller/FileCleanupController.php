@@ -6,6 +6,7 @@ namespace Anubit\Filefix\Controller;
 
 use Anubit\Filefix\Service\ActionLogger;
 use Anubit\Filefix\Service\FileCleanupService;
+use Anubit\Filefix\Utility\Labels;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
@@ -138,13 +139,14 @@ class FileCleanupController
         $buttonBar->addButton(
             $buttonBar->makeLinkButton()
                 ->setHref((string)$this->uriBuilder->buildUriFromRoute('filefix_cleanup', $baseParams))
-                ->setTitle('Refresh')
+                ->setTitle(Labels::get('clean.refresh'))
                 ->setShowLabelText(true)
                 ->setIcon($this->iconFactory->getIcon('actions-refresh', class_exists(IconSize::class) ? IconSize::SMALL : 'small')),
             ButtonBar::BUTTON_POSITION_RIGHT
         );
 
         $moduleTemplate->assignMultiple([
+            'jsLabels'           => Labels::many(['common.cancel', 'clean.deselectAll', 'clean.js.flushText', 'clean.js.flushType', 'clean.js.flushMismatch', 'clean.js.flushTitle', 'clean.js.deleteAll', 'clean.js.noSelection', 'clean.js.noSelectionText', 'clean.js.deleteSelectedTitle', 'clean.js.deleteSelectedText', 'clean.js.deleteCount']),
             'unusedFiles'        => $unusedFiles,
             'unusedCount'        => $totalUnused,
             'totalUnfiltered'    => $totalUnfiltered,
@@ -203,8 +205,8 @@ class FileCleanupController
             }
             if ($deleted > 0) {
                 $queue->enqueue(new FlashMessage(
-                    $deleted . ' unused file(s) deleted from disk and FAL.',
-                    'File Cleanup',
+                    Labels::get('clean.flash.deleted', $deleted),
+                    Labels::get('clean.title'),
                     ContextualFeedbackSeverity::OK,
                     true
                 ));
@@ -219,8 +221,8 @@ class FileCleanupController
             }
             if ($deleted > 0) {
                 $queue->enqueue(new FlashMessage(
-                    $deleted . ' unused file(s) deleted from disk and FAL.',
-                    'Folder Flush',
+                    Labels::get('clean.flash.deleted', $deleted),
+                    Labels::get('clean.flash.flushTitle'),
                     ContextualFeedbackSeverity::OK,
                     true
                 ));
@@ -232,7 +234,7 @@ class FileCleanupController
         foreach ($errors as $msg) {
             $queue->enqueue(new FlashMessage(
                 $msg,
-                'Cleanup failed',
+                Labels::get('clean.flash.failed'),
                 ContextualFeedbackSeverity::ERROR,
                 true
             ));

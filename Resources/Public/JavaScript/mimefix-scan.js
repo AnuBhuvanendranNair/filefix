@@ -1,5 +1,6 @@
 import Modal from '@typo3/backend/modal.js';
 import Severity from '@typo3/backend/severity.js';
+import { t } from '@anubit/filefix/labels.js';
 
 // Loading overlay (same as File Cleanup module) for "Scan again" and the fix submit
 const loadingOverlay = document.getElementById('filefix-loading');
@@ -30,7 +31,7 @@ if (selectBtn && label) {
         const checkboxes = document.querySelectorAll('.mimefix-checkbox');
         const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
         checkboxes.forEach((cb) => { cb.checked = !allChecked; });
-        label.textContent = allChecked ? selectAllText : 'Deselect all';
+        label.textContent = allChecked ? selectAllText : t('clean.deselectAll');
     });
 }
 
@@ -41,21 +42,21 @@ if (fixBtn && form) {
         const checked = document.querySelectorAll('.mimefix-checkbox:checked').length;
         if (checked === 0) {
             Modal.confirm(
-                'No files selected',
-                'Select at least one file before fixing.',
+                t('mime.js.noFiles'),
+                t('mime.js.noFilesText'),
                 Severity.notice,
-                [{ text: 'OK', btnClass: 'btn-default', name: 'ok' }]
+                [{ text: t('common.ok'), btnClass: 'btn-default', name: 'ok' }]
             );
             return;
         }
         Modal.confirm(
-            'Fix selected files',
-            'Process ' + checked + ' file(s): convert content and/or update sys_file records. Continue?',
+            t('mime.js.fixTitle'),
+            t('mime.js.fixText', checked),
             Severity.warning,
             [
-                { text: 'Cancel', btnClass: 'btn-default', name: 'cancel' },
+                { text: t('common.cancel'), btnClass: 'btn-default', name: 'cancel' },
                 {
-                    text: 'Fix',
+                    text: t('mime.js.fix'),
                     btnClass: 'btn-warning',
                     name: 'ok',
                     trigger: () => { Modal.dismiss(); showLoading(); form.submit(); }

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="messages" date="2026-10-05T00:00:00Z" product-name="filefix">
+        <header/>
+        <body>
+            <trans-unit id="widgetGroup.filefix">
+                <source>File housekeeping</source>
+            </trans-unit>
+            <trans-unit id="widget.unusedFilesByType.title">
+                <source>Unused files by type</source>
+            </trans-unit>
+            <trans-unit id="widget.unusedFilesByType.description">
+                <source>Number of files without any reference, grouped by file type (default storage)</source>
+            </trans-unit>
+            <trans-unit id="widget.unusedSpaceByType.title">
+                <source>Unused space by type</source>
+            </trans-unit>
+            <trans-unit id="widget.unusedSpaceByType.description">
+                <source>Disk space used by files without any reference, grouped by file type (default storage)</source>
+            </trans-unit>
+            <trans-unit id="widget.unusedFilesCount.title">
+                <source>Unused files</source>
+            </trans-unit>
+            <trans-unit id="widget.unusedFilesCount.text">
+                <source>files without any reference</source>
+            </trans-unit>
+            <trans-unit id="widget.unusedFilesCount.description">
+                <source>Total number of files without any reference in the default storage</source>
+            </trans-unit>
+            <trans-unit id="widget.reclaimableSpace.title">
+                <source>Reclaimable space</source>
+            </trans-unit>
+            <trans-unit id="widget.reclaimableSpace.text">
+                <source>used by unreferenced files</source>
+            </trans-unit>
+            <trans-unit id="widget.reclaimableSpace.description">
+                <source>Disk space that could be freed by removing unreferenced files</source>
+            </trans-unit>
+            <trans-unit id="chart.total">
+                <source>Total: %s</source>
+            </trans-unit>
+            <trans-unit id="chart.files">
+                <source>%s files</source>
+            </trans-unit>
+            <trans-unit id="chart.other">
+                <source>other</source>
+            </trans-unit>
+            <trans-unit id="chart.noExtension">
+                <source>(none)</source>
+            </trans-unit>
+            <trans-unit id="format.decimalSeparator">
+                <source>.</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

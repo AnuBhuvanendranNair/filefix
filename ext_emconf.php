@@ -7,12 +7,14 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Anu Bhuvanendran Nair',
     'author_email' => '',
     'state' => 'stable',
-    'version' => '1.1.1',
+    'version' => '1.2.0',
     'constraints' => [
         'depends' => [
             'typo3' => '12.4.0-14.9.99',
         ],
         'conflicts' => [],
-        'suggests' => [],
+        'suggests' => [
+            'dashboard' => '12.4.0-14.9.99',
+        ],
     ],
 ];

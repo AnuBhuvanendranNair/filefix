@@ -1,5 +1,6 @@
 import Modal from '@typo3/backend/modal.js';
 import { SeverityEnum } from '@typo3/backend/enum/severity.js';
+import { t } from '@anubit/filefix/labels.js';
 
 // Loading overlay for every navigation that goes back to the server (paging, filters,
 // delete). Without it the module looks frozen while the unused-files queries run.
@@ -121,7 +122,7 @@ function wireSelectAll(btnId, labelId, checkboxClass) {
         const checkboxes = document.querySelectorAll('.' + checkboxClass + ':not(:disabled)');
         const allChecked = Array.from(checkboxes).every((cb) => cb.checked);
         checkboxes.forEach((cb) => { cb.checked = !allChecked; });
-        label.textContent = allChecked ? selectAllText : 'Deselect all';
+        label.textContent = allChecked ? selectAllText : t('clean.deselectAll');
     });
 }
 
@@ -137,18 +138,18 @@ if (flushBtn) {
 
         const contentEl = document.createElement('div');
         contentEl.innerHTML =
-            '<p>Permanently delete all <strong>' + count + '</strong> filtered file(s) from disk and remove FAL records. This cannot be undone.</p>' +
-            '<p class="mb-1">Type <strong>' + count + '</strong> below to confirm:</p>' +
+            '<p>' + t('clean.js.flushText', count) + '</p>' +
+            '<p class="mb-1">' + t('clean.js.flushType', count) + '</p>' +
             '<input type="text" class="form-control" id="flush-confirm-input" autocomplete="off" />' +
-            '<div class="invalid-feedback" id="flush-confirm-error">Does not match — expected ' + count + '.</div>';
+            '<div class="invalid-feedback" id="flush-confirm-error">' + t('clean.js.flushMismatch', count) + '</div>';
 
         const modal = Modal.advanced({
-            title: 'Delete all filtered files',
+            title: t('clean.js.flushTitle'),
             content: contentEl,
             severity: SeverityEnum.error,
             buttons: [
-                { text: 'Cancel', active: true, btnClass: 'btn-default', name: 'cancel' },
-                { text: 'Delete all', btnClass: 'btn-danger', name: 'ok' },
+                { text: t('common.cancel'), active: true, btnClass: 'btn-default', name: 'cancel' },
+                { text: t('clean.js.deleteAll'), btnClass: 'btn-danger', name: 'ok' },
             ],
         });
 
@@ -185,16 +186,16 @@ if (deleteBtn) {
     deleteBtn.addEventListener('click', () => {
         const checked = document.querySelectorAll('.cleanup-unused:checked:not(:disabled)').length;
         if (checked === 0) {
-            Modal.show('No selection', 'No files selected. Check at least one row.', SeverityEnum.info);
+            Modal.show(t('clean.js.noSelection'), t('clean.js.noSelectionText'), SeverityEnum.info);
             return;
         }
         const modal = Modal.confirm(
-            'Delete selected files',
-            'Permanently delete ' + checked + ' selected file(s) from disk and remove FAL records. This cannot be undone.',
+            t('clean.js.deleteSelectedTitle'),
+            t('clean.js.deleteSelectedText', checked),
             SeverityEnum.error,
             [
-                { text: 'Cancel', active: true, btnClass: 'btn-default', name: 'cancel' },
-                { text: 'Delete ' + checked + ' file(s)', btnClass: 'btn-danger', name: 'ok' },
+                { text: t('common.cancel'), active: true, btnClass: 'btn-default', name: 'cancel' },
+                { text: t('clean.js.deleteCount', checked), btnClass: 'btn-danger', name: 'ok' },
             ]
         );
         modal.addEventListener('button.clicked', (e) => {

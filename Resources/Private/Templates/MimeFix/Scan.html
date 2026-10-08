@@ -8,16 +8,18 @@
 <f:section name="Content">
 
 <f:be.pageRenderer includeJavaScriptModules="{0: '@anubit/filefix/mimefix-scan.js'}" />
+<f:comment>Translated labels for the JavaScript modules</f:comment>
+<div id="filefix-labels" hidden="hidden" data-labels="{jsLabels -> f:format.json()}"></div>
 
 <div id="filefix-loading" class="d-none position-fixed top-0 start-0 w-100 h-100 flex-column align-items-center justify-content-center gap-2 bg-body bg-opacity-75" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:1050;background-color:rgba(var(--bs-body-bg-rgb, 255, 255, 255), .75)">
     <core:icon identifier="spinner-circle" size="large" />
-    <span class="text-body-secondary">Loading…</span>
+    <span class="text-body-secondary"><f:translate key="common.loading" extensionName="Filefix" /></span>
 </div>
 
 <h1>
     {folderName}
     <f:if condition="{mismatchCount} > 0">
-        <small class="text-body-secondary fs-6 fw-normal ms-2">{mismatchCount} issue(s) found</small>
+        <small class="text-body-secondary fs-6 fw-normal ms-2"><f:translate key="mime.issues" extensionName="Filefix" arguments="{0: mismatchCount}" /></small>
     </f:if>
 </h1>
 
@@ -29,18 +31,18 @@
 
             <div class="row row-cols-auto gx-2 mb-2 align-items-center">
                 <div class="col">
-                    <strong>Selection</strong>
+                    <strong><f:translate key="clean.selection" extensionName="Filefix" /></strong>
                 </div>
                 <div class="col">
                     <button type="button" class="btn btn-default btn-sm" id="mimefix-select-all">
                         <core:icon identifier="actions-check" size="small" />
-                        <span id="mimefix-select-label">Select all actionable ({selectableCount})</span>
+                        <span id="mimefix-select-label"><f:translate key="mime.selectActionable" extensionName="Filefix" arguments="{0: selectableCount}" /></span>
                     </button>
                 </div>
                 <div class="col">
                     <button type="button" class="btn btn-default btn-sm" id="mimefix-fix-btn">
                         <core:icon identifier="actions-document-synchronize" size="small" />
-                        Fix selected
+                        <f:translate key="mime.fixSelected" extensionName="Filefix" />
                     </button>
                 </div>
             </div>
@@ -50,12 +52,12 @@
                     <thead>
                         <tr>
                             <th class="col-checkbox"></th>
-                            <th>File</th>
-                            <th>Extension</th>
-                            <th>Actual MIME</th>
-                            <th>Expected MIME</th>
-                            <th>DB MIME (sys_file)</th>
-                            <th>Status</th>
+                            <th><f:translate key="mime.col.file" extensionName="Filefix" /></th>
+                            <th><f:translate key="mime.col.extension" extensionName="Filefix" /></th>
+                            <th><f:translate key="mime.col.actual" extensionName="Filefix" /></th>
+                            <th><f:translate key="mime.col.expected" extensionName="Filefix" /></th>
+                            <th><f:translate key="mime.col.db" extensionName="Filefix" /></th>
+                            <th><f:translate key="mime.col.status" extensionName="Filefix" /></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,7 +87,7 @@
                                             <code class="{f:if(condition: item.dbOutOfSync, then: 'text-danger')}">{item.dbMime}</code>
                                         </f:then>
                                         <f:else>
-                                            <span class="text-body-secondary">not indexed</span>
+                                            <span class="text-body-secondary"><f:translate key="mime.notIndexed" extensionName="Filefix" /></span>
                                         </f:else>
                                     </f:if>
                                 </td>
@@ -96,18 +98,18 @@
                                                 <f:then>
                                                     <span class="badge badge-warning">
                                                         <core:icon identifier="actions-exclamation-triangle" size="small" />
-                                                        Fixable
+                                                        <f:translate key="mime.fixable" extensionName="Filefix" />
                                                     </span>
                                                 </f:then>
                                                 <f:else>
-                                                    <span class="badge badge-danger">Cannot fix</span>
+                                                    <span class="badge badge-danger"><f:translate key="mime.cannotFix" extensionName="Filefix" /></span>
                                                 </f:else>
                                             </f:if>
                                         </f:then>
                                         <f:else>
                                             <span class="badge badge-info">
                                                 <core:icon identifier="actions-database" size="small" />
-                                                DB out of sync
+                                                <f:translate key="mime.dbOutOfSync" extensionName="Filefix" />
                                             </span>
                                         </f:else>
                                     </f:if>
@@ -122,8 +124,8 @@
     <f:else>
         <div class="t3-filelist-info-container">
             <core:icon identifier="actions-check" size="large" />
-            <h5 class="mt-2">No issues found</h5>
-            <p>All files in <strong>{folderName}</strong> have correct content and matching sys_file records.</p>
+            <h5 class="mt-2"><f:translate key="mime.noIssues" extensionName="Filefix" /></h5>
+            <p><f:translate key="mime.noIssues.text" extensionName="Filefix" arguments="{0: folderName}" /></p>
         </div>
     </f:else>
 </f:if>

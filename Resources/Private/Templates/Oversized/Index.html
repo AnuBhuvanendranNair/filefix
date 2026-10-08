@@ -1,0 +1,186 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+<f:layout name="Module" />
+
+<f:section name="Content">
+
+<f:if condition="{accessDenied}">
+    <f:then>
+        <h1><f:translate key="over.title" extensionName="Filefix" /></h1>
+        <div class="alert alert-warning"><f:translate key="common.adminOnly" extensionName="Filefix" /></div>
+    </f:then>
+    <f:else>
+
+<f:comment>Same overlay, layout rules and loading behaviour as the duplicate report</f:comment>
+<f:be.pageRenderer
+    includeJavaScriptModules="{0: '@anubit/filefix/duplicates.js', 1: '@anubit/filefix/oversized.js'}"
+    includeCssFiles="{0: 'EXT:filefix/Resources/Public/Css/duplicates.css'}"
+/>
+<f:comment>Translated labels for the JavaScript modules</f:comment>
+<div id="filefix-labels" hidden="hidden" data-labels="{jsLabels -> f:format.json()}"></div>
+
+<div id="filefix-loading" class="d-none position-fixed top-0 start-0 w-100 h-100 flex-column align-items-center justify-content-center gap-2 bg-body bg-opacity-75" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:1050;background-color:rgba(var(--bs-body-bg-rgb, 255, 255, 255), .75)">
+    <core:icon identifier="spinner-circle" size="large" />
+    <span class="text-body-secondary filefix-loading-text"><f:translate key="common.loading" extensionName="Filefix" /></span>
+</div>
+
+<h1>
+    <f:translate key="over.title" extensionName="Filefix" />
+    <small class="text-body-secondary fs-6 fw-normal ms-2">
+        <f:translate key="over.subtitle" extensionName="Filefix" arguments="{0: maxWidth, 1: maxHeight}" /><f:if condition="{folderName} != ''"> <f:translate key="common.in" extensionName="Filefix" /> <strong>{folderName}</strong><f:if condition="{recursive}"> <f:translate key="common.andSubfolders" extensionName="Filefix" /></f:if></f:if>
+    </small>
+</h1>
+
+<form method="get" action="{formAction}" class="d-flex flex-wrap align-items-end gap-3 mb-3" data-filefix-loading-form="1">
+    <f:for each="{formHiddenFields}" as="value" key="name">
+        <input type="hidden" name="{name}" value="{value}" />
+    </f:for>
+    <input type="hidden" name="submitted" value="1" />
+    <div>
+        <label class="form-label small mb-1" for="filefix-max-width"><f:translate key="over.maxWidth" extensionName="Filefix" /></label>
+        <input type="number" class="form-control form-control-sm" id="filefix-max-width" name="maxWidth" value="{maxWidth}" min="100" max="10000" step="1" style="width:8rem" />
+    </div>
+    <div>
+        <label class="form-label small mb-1" for="filefix-max-height"><f:translate key="over.maxHeight" extensionName="Filefix" /></label>
+        <input type="number" class="form-control form-control-sm" id="filefix-max-height" name="maxHeight" value="{maxHeight}" min="100" max="10000" step="1" style="width:8rem" />
+    </div>
+    <div class="form-check mb-1">
+        <input type="checkbox" class="form-check-input" id="filefix-recursive" name="recursive" value="1" {f:if(condition: recursive, then: 'checked="checked"')} />
+        <label class="form-check-label small" for="filefix-recursive"><f:translate key="over.includeSubfolders" extensionName="Filefix" /></label>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-default btn-sm"><core:icon identifier="actions-refresh" size="small" /> <f:translate key="over.update" extensionName="Filefix" /></button>
+    </div>
+</form>
+
+<div class="row g-2 mb-3">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card mb-0"><div class="card-body p-2">
+            <div class="small text-body-secondary"><f:translate key="over.card.count" extensionName="Filefix" /></div>
+            <div class="fs-4 fw-bold">{summary.count}</div>
+        </div></div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card mb-0"><div class="card-body p-2">
+            <div class="small text-body-secondary"><f:translate key="over.card.size" extensionName="Filefix" /></div>
+            <div class="fs-4 fw-bold"><f:format.bytes decimals="1">{summary.size}</f:format.bytes></div>
+        </div></div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card mb-0"><div class="card-body p-2">
+            <div class="small text-body-secondary"><f:translate key="over.card.estimated" extensionName="Filefix" /></div>
+            <div class="fs-4 fw-bold"><f:format.bytes decimals="1">{summary.estimatedSize}</f:format.bytes></div>
+        </div></div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card mb-0"><div class="card-body p-2">
+            <div class="small text-body-secondary"><f:translate key="over.card.saving" extensionName="Filefix" /></div>
+            <div class="fs-4 fw-bold text-success"><f:format.bytes decimals="1">{summary.saving}</f:format.bytes> <small class="fs-6">({savingPercent} %)</small></div>
+        </div></div>
+    </div>
+</div>
+
+<p class="text-body-secondary small">
+    <f:translate key="over.note.readOnly" extensionName="Filefix" arguments="{0: fileTypes}" />
+    <f:translate key="over.note.defaults" extensionName="Filefix" arguments="{0: settingsMaxWidth, 1: settingsMaxHeight}" />
+    <f:if condition="!{isDefaultSize}"><f:translate key="over.note.otherDimensions" extensionName="Filefix" /></f:if>
+    <f:translate key="over.note.estimate" extensionName="Filefix" />
+    <f:translate key="over.note.onDisk" extensionName="Filefix" />
+    <f:if condition="{summary.notOnDisk}"><strong><f:translate key="over.note.notOnDisk" extensionName="Filefix" arguments="{0: summary.notOnDisk}" /></strong></f:if>
+    <f:if condition="{summary.unknownDimensions}"><strong><f:translate key="over.note.unknownDimensions" extensionName="Filefix" arguments="{0: summary.unknownDimensions}" /></strong></f:if>
+</p>
+
+<f:if condition="{summary.count} == 0">
+    <f:then>
+        <div class="t3-filelist-info-container">
+            <core:icon identifier="actions-check" size="large" />
+            <h5 class="mt-2"><f:translate key="over.empty.title" extensionName="Filefix" /></h5>
+            <p><f:translate key="over.empty.text" extensionName="Filefix" arguments="{0: maxWidth, 1: maxHeight}" /></p>
+        </div>
+    </f:then>
+    <f:else>
+        <div class="table-fit">
+            <table class="table table-hover filefix-dup-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th><f:translate key="common.path" extensionName="Filefix" /></th>
+                        <th><f:translate key="over.col.dimensions" extensionName="Filefix" /></th>
+                        <th><f:translate key="over.col.resizedTo" extensionName="Filefix" /></th>
+                        <th class="text-end"><f:translate key="over.col.size" extensionName="Filefix" /></th>
+                        <th class="text-end"><f:translate key="over.col.estimated" extensionName="Filefix" /></th>
+                        <th class="text-end"><f:translate key="over.col.saving" extensionName="Filefix" /></th>
+                        <th class="text-end"><f:translate key="common.usages" extensionName="Filefix" /></th>
+                        <th class="filefix-dup-actions"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <f:for each="{images}" as="image">
+                        <tr>
+                            <td style="width:64px">
+                                <span class="filefix-dup-thumb">
+                                    <f:if condition="{image.thumbnailUrl}">
+                                        <f:then><img src="{image.thumbnailUrl}" alt="" loading="lazy" /></f:then>
+                                        <f:else><core:icon identifier="mimetypes-media-image" size="medium" /></f:else>
+                                    </f:if>
+                                </span>
+                            </td>
+                            <td><a href="{storagePublicBase}{image.identifier}" target="_blank" rel="noopener"><code class="small">{image.identifier}</code></a></td>
+                            <td class="text-nowrap">{image.width} × {image.height}</td>
+                            <td class="text-nowrap">{image.newWidth} × {image.newHeight}</td>
+                            <td class="text-nowrap text-end"><f:format.bytes decimals="1">{image.size}</f:format.bytes></td>
+                            <td class="text-nowrap text-end"><f:format.bytes decimals="1">{image.estimatedSize}</f:format.bytes></td>
+                            <td class="text-nowrap text-end"><strong><f:format.bytes decimals="1">{image.saving}</f:format.bytes></strong> <span class="text-body-secondary small">({image.savingPercent} %)</span></td>
+                            <td class="text-end">{image.references}</td>
+                            <td class="filefix-dup-actions">
+                                <f:if condition="{image.resizable}">
+                                    <f:then>
+                                        <f:if condition="{isDefaultSize}">
+                                            <f:then>
+                                                <button type="button" class="btn btn-default btn-sm"
+                                                        data-filefix-resize="{resizeUrl}"
+                                                        data-filefix-file="{image.uid}"
+                                                        data-filefix-title="{f:translate(key: 'over.resize.modalTitle', extensionName: 'Filefix', arguments: {0: image.identifier})}"
+                                                        title="{f:translate(key: 'over.resize.buttonTitle', extensionName: 'Filefix', arguments: {0: settingsMaxWidth, 1: settingsMaxHeight})}">
+                                                    <core:icon identifier="actions-image" size="small" /> <f:translate key="over.resize" extensionName="Filefix" />
+                                                </button>
+                                            </f:then>
+                                            <f:else>
+                                                <span class="text-body-secondary small" title="{f:translate(key: 'over.resize.settingsHint', extensionName: 'Filefix')}"><f:translate key="over.resize.settingsLabel" extensionName="Filefix" arguments="{0: settingsMaxWidth, 1: settingsMaxHeight}" /></span>
+                                            </f:else>
+                                        </f:if>
+                                    </f:then>
+                                    <f:else><span class="badge badge-default" title="{f:translate(key: 'over.reportOnly.title', extensionName: 'Filefix', arguments: {0: resizeTypes})}"><f:translate key="over.reportOnly" extensionName="Filefix" /></span></f:else>
+                                </f:if>
+                            </td>
+                        </tr>
+                    </f:for>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row align-items-center mt-2 mb-4">
+            <div class="col">
+                <small class="text-body-secondary"><f:translate key="over.showing" extensionName="Filefix" arguments="{0: rangeFrom, 1: rangeTo, 2: summary.count}" /></small>
+            </div>
+            <div class="col-auto d-flex align-items-center gap-2">
+                <f:if condition="{prevPageUrl}">
+                    <a href="{prevPageUrl}" class="btn btn-default btn-sm"><core:icon identifier="actions-arrow-left" size="small" /> <f:translate key="common.previous" extensionName="Filefix" /></a>
+                </f:if>
+                <span class="text-body-secondary small"><f:translate key="common.pageOf" extensionName="Filefix" arguments="{0: currentPage, 1: totalPages}" /></span>
+                <f:if condition="{nextPageUrl}">
+                    <a href="{nextPageUrl}" class="btn btn-default btn-sm"><f:translate key="common.next" extensionName="Filefix" /> <core:icon identifier="actions-arrow-right" size="small" /></a>
+                </f:if>
+            </div>
+        </div>
+    </f:else>
+</f:if>
+
+    </f:else>
+</f:if>
+
+</f:section>
+</html>

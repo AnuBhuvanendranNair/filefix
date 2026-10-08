@@ -28,15 +28,21 @@ return [
         'access'          => 'user',
         'workspaces'      => 'live',
         'iconIdentifier'  => 'filefix-cleanup',
-        'labels'          => [
-            'title'       => 'File Cleanup',
-            'description' => 'Find and remove unused files and orphaned FAL records from fileadmin',
-        ],
+        // Locallang file: title, description and short description (mlang_* keys), translated in de.locallang_mod.xlf
+        'labels'          => 'LLL:EXT:filefix/Resources/Private/Language/locallang_mod.xlf',
         'extensionName'        => 'Filefix',
         'navigationComponent'  => '@typo3/backend/tree/file-storage-browser',
         'routes'               => [
             '_default' => [
                 'target' => \Anubit\Filefix\Controller\FileCleanupController::class . '::indexAction',
+            ],
+            // Read-only duplicate report, opened from the file list toolbar (route filefix_cleanup.duplicates)
+            'duplicates' => [
+                'target' => \Anubit\Filefix\Controller\DuplicatesController::class . '::indexAction',
+            ],
+            // Read-only oversized image report, opened from the file list toolbar (route filefix_cleanup.oversized)
+            'oversized' => [
+                'target' => \Anubit\Filefix\Controller\OversizedController::class . '::indexAction',
             ],
         ],
     ],

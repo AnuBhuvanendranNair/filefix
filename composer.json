@@ -15,6 +15,9 @@
         "typo3/cms-extbase": "^12.4 || ^13.4 || ^14.0",
         "typo3/cms-fluid": "^12.4 || ^13.4 || ^14.0"
     },
+    "suggest": {
+        "typo3/cms-dashboard": "Dashboard widgets with unused-file statistics"
+    },
     "autoload": {
         "psr-4": {
             "Anubit\\Filefix\\": "Classes"

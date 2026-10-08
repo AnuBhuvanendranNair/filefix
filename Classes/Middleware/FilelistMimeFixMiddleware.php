@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Anubit\Filefix\Middleware;
 
 use Anubit\Filefix\Service\MimeTypeService;
+use Anubit\Filefix\Utility\Labels;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -105,7 +106,15 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
         }
         if ($folderId !== '') {
             $scanHref = '/typo3/module/file/list?id=' . rawurlencode($folderId) . '&mimefix_scan=1';
-            $this->pageRenderer->addJsInlineCode('filefix-toolbar', $this->buildToolbarScript($scanHref), false, false, true);
+            // Duplicate report is admin only (shows paths outside file mounts and records on any page)
+            $isAdmin = (bool)($GLOBALS['BE_USER'] ?? null)?->isAdmin();
+            $duplicatesHref = $isAdmin
+                ? (string)$this->uriBuilder->buildUriFromRoute('filefix_cleanup.duplicates', ['id' => $folderId])
+                : null;
+            $oversizedHref = $isAdmin
+                ? (string)$this->uriBuilder->buildUriFromRoute('filefix_cleanup.oversized', ['id' => $folderId])
+                : null;
+            $this->pageRenderer->addJsInlineCode('filefix-toolbar', $this->buildToolbarScript($scanHref, $duplicatesHref, $oversizedHref), false, false, true);
         }
 
         return $handler->handle($request);
@@ -167,7 +176,7 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
         $buttonBar->addButton(
             $buttonBar->makeLinkButton()
                 ->setHref($backUrl)
-                ->setTitle('Back to file list')
+                ->setTitle(Labels::get('common.backToFileList'))
                 ->setShowLabelText(true)
                 ->setIcon($this->iconFactory->getIcon('actions-view-list-collapse', class_exists(IconSize::class) ? IconSize::SMALL : 'small')),
             ButtonBar::BUTTON_POSITION_LEFT,
@@ -176,12 +185,13 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
         $buttonBar->addButton(
             $buttonBar->makeLinkButton()
                 ->setHref($scanAgainUrl)
-                ->setTitle('Scan again')
+                ->setTitle(Labels::get('mime.scanAgain'))
                 ->setIcon($this->iconFactory->getIcon('actions-refresh', class_exists(IconSize::class) ? IconSize::SMALL : 'small')),
             ButtonBar::BUTTON_POSITION_RIGHT
         );
 
         $moduleTemplate->assignMultiple([
+            'jsLabels'          => Labels::many(['common.cancel', 'common.ok', 'clean.deselectAll', 'mime.js.noFiles', 'mime.js.noFilesText', 'mime.js.fixTitle', 'mime.js.fixText', 'mime.js.fix']),
             'folderIdentifier'  => $folderId,
             'folderName'        => $folder->getName() ?: $folder->getStorage()->getName(),
             'mismatches'        => $mismatches,
@@ -209,7 +219,7 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
         foreach ($files as $filePath) {
             $realPath = realpath((string)$filePath);
             if (!$realPath || !$realFileadmin || !str_starts_with($realPath, $realFileadmin)) {
-                $errors[] = basename((string)$filePath) . ': path rejected (security check)';
+                $errors[] = Labels::get('mime.error.pathRejected', basename((string)$filePath));
                 continue;
             }
 
@@ -224,7 +234,7 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
             }
 
             if ($storage === null) {
-                $errors[] = basename($realPath) . ': storage could not be resolved';
+                $errors[] = Labels::get('mime.error.storage', basename($realPath));
                 continue;
             }
 
@@ -237,7 +247,7 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
                     $storageBase = rtrim(\TYPO3\CMS\Core\Core\Environment::getPublicPath(), '/')
                         . '/' . ltrim($storageCfg['basePath'] ?? 'fileadmin', '/');
                     if (!$this->mimeTypeService->fixDbMimeType($realPath, $storage->getUid(), $storageBase)) {
-                        $errors[] = basename($realPath) . ': not indexed in sys_file — index the file via TYPO3 file module first';
+                        $errors[] = Labels::get('mime.error.notIndexed', basename($realPath));
                         continue;
                     }
                 } else {
@@ -255,8 +265,8 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
         $queue = $this->flashMessageService->getMessageQueueByIdentifier();
         if ($fixed > 0) {
             $queue->enqueue(new FlashMessage(
-                $fixed . ' file(s) processed and sys_file record(s) updated.',
-                'MIME fix',
+                Labels::get('mime.flash.fixed', $fixed),
+                Labels::get('mime.flash.title'),
                 ContextualFeedbackSeverity::OK,
                 true
             ));
@@ -264,7 +274,7 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
         foreach ($errors as $msg) {
             $queue->enqueue(new FlashMessage(
                 $msg,
-                'MIME fix failed',
+                Labels::get('mime.flash.failed'),
                 ContextualFeedbackSeverity::ERROR,
                 true
             ));
@@ -300,9 +310,20 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
         return rtrim($basePath, '/') . $folder->getIdentifier();
     }
 
-    private function buildToolbarScript(string $scanHref): string
+    /**
+     * "Scan MIME" button for everyone, plus "Find duplicates" and "Oversized images" when their hrefs are set (admins).
+     */
+    private function buildToolbarScript(string $scanHref, ?string $duplicatesHref = null, ?string $oversizedHref = null): string
     {
         $hrefJson = json_encode($scanHref, JSON_UNESCAPED_SLASHES);
+        $duplicatesHrefJson = json_encode($duplicatesHref, JSON_UNESCAPED_SLASHES);
+        $oversizedHrefJson = json_encode($oversizedHref, JSON_UNESCAPED_SLASHES);
+        // Inline script: escape <, >, & and quotes so a label can never close the script tag
+        $labelsJson = json_encode(Labels::many([
+            'toolbar.scan', 'toolbar.scan.title', 'toolbar.scan.loading',
+            'toolbar.duplicates', 'toolbar.duplicates.title', 'toolbar.duplicates.loading',
+            'toolbar.oversized', 'toolbar.oversized.title', 'toolbar.oversized.loading',
+        ]), JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
         return <<<JS
 (function () {
     var inject = function () {
@@ -318,19 +339,37 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
             toolbar.setAttribute('role', 'toolbar');
             container.appendChild(toolbar);
         }
-        var btn = document.createElement('a');
-        btn.id        = 'mimefix-scan-btn';
-        btn.href      = {$hrefJson};
-        btn.className = 'btn btn-default btn-sm';
-        btn.title     = 'Scan folder for MIME type mismatches';
-        var icon = document.createElement('typo3-backend-icon');
-        icon.setAttribute('identifier', 'actions-search');
-        icon.setAttribute('size', 'small');
-        btn.appendChild(icon);
-        btn.appendChild(document.createTextNode(' Scan MIME'));
-        // Loading overlay (same markup as the File Cleanup module): the scan runs server-side
-        // before any response, without it the file list looks frozen
-        btn.addEventListener('click', function (e) {
+        var duplicatesHref = {$duplicatesHrefJson};
+        var oversizedHref = {$oversizedHrefJson};
+        var labels = {$labelsJson};
+        var makeLink = function (id, href, iconIdentifier, label, title, className, loadingText) {
+            var link = document.createElement('a');
+            if (id) { link.id = id; }
+            link.href      = href;
+            link.className = className;
+            link.title     = title;
+            var icon = document.createElement('typo3-backend-icon');
+            icon.setAttribute('identifier', iconIdentifier);
+            icon.setAttribute('size', 'small');
+            link.appendChild(icon);
+            link.appendChild(document.createTextNode(' ' + label));
+            link.addEventListener('click', function (e) { showLoading(e, loadingText); });
+            return link;
+        };
+        toolbar.appendChild(makeLink('mimefix-scan-btn', {$hrefJson}, 'actions-search', labels['toolbar.scan'],
+            labels['toolbar.scan.title'], 'btn btn-default btn-sm', labels['toolbar.scan.loading']));
+        if (duplicatesHref) {
+            toolbar.appendChild(makeLink('filefix-duplicates-btn', duplicatesHref, 'actions-duplicate', labels['toolbar.duplicates'],
+                labels['toolbar.duplicates.title'], 'btn btn-default btn-sm', labels['toolbar.duplicates.loading']));
+        }
+        if (oversizedHref) {
+            toolbar.appendChild(makeLink('filefix-oversized-btn', oversizedHref, 'mimetypes-media-image', labels['toolbar.oversized'],
+                labels['toolbar.oversized.title'], 'btn btn-default btn-sm', labels['toolbar.oversized.loading']));
+        }
+    };
+    // Loading overlay (same markup as the File Cleanup module): the scan/search runs server-side
+    // before any response, without it the file list looks frozen
+    var showLoading = function (e, loadingText) {
             if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
             var overlay = document.getElementById('filefix-loading');
             if (!overlay) {
@@ -343,16 +382,15 @@ class FilelistMimeFixMiddleware implements MiddlewareInterface
                 spinner.setAttribute('identifier', 'spinner-circle');
                 spinner.setAttribute('size', 'large');
                 var text = document.createElement('span');
-                text.className = 'text-body-secondary';
-                text.textContent = 'Scanning for MIME type mismatches…';
+                text.className = 'text-body-secondary filefix-loading-text';
                 overlay.appendChild(spinner);
                 overlay.appendChild(text);
                 document.body.appendChild(overlay);
             }
+            // Own class: spans inside the spinner icon must not be overwritten
+            overlay.querySelector('.filefix-loading-text').textContent = loadingText;
             overlay.classList.remove('d-none');
             overlay.classList.add('d-flex');
-        });
-        toolbar.appendChild(btn);
     };
     // Back/forward cache restores the page with the overlay still visible
     window.addEventListener('pageshow', function (e) {

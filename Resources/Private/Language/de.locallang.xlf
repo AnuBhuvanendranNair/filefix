@@ -1,0 +1,972 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="de" datatype="plaintext" original="messages" date="2026-10-07T00:00:00Z" product-name="filefix">
+        <header/>
+        <body>
+            <trans-unit id="clean.allClean" resname="clean.allClean">
+                <source>All clean</source>
+                <target>Alles sauber</target>
+            </trans-unit>
+            <trans-unit id="clean.allClean.text" resname="clean.allClean.text">
+                <source>No unused files or orphaned FAL records found.</source>
+                <target>Keine unbenutzten Dateien oder verwaisten FAL-Einträge gefunden.</target>
+            </trans-unit>
+            <trans-unit id="clean.allClean.textFolder" resname="clean.allClean.textFolder">
+                <source>No unused files or orphaned FAL records found in %s.</source>
+                <target>Keine unbenutzten Dateien oder verwaisten FAL-Einträge in %s gefunden.</target>
+            </trans-unit>
+            <trans-unit id="clean.allTypes" resname="clean.allTypes">
+                <source>All types</source>
+                <target>Alle Typen</target>
+            </trans-unit>
+            <trans-unit id="clean.col.mimeType" resname="clean.col.mimeType">
+                <source>MIME type</source>
+                <target>MIME-Typ</target>
+            </trans-unit>
+            <trans-unit id="clean.col.modified" resname="clean.col.modified">
+                <source>Last modified</source>
+                <target>Zuletzt geändert</target>
+            </trans-unit>
+            <trans-unit id="clean.col.size" resname="clean.col.size">
+                <source>Size</source>
+                <target>Größe</target>
+            </trans-unit>
+            <trans-unit id="clean.deleteAllFiltered" resname="clean.deleteAllFiltered">
+                <source>Delete all filtered (%s)</source>
+                <target>Alle gefilterten löschen (%s)</target>
+            </trans-unit>
+            <trans-unit id="clean.deleteSelected" resname="clean.deleteSelected">
+                <source>Delete selected</source>
+                <target>Ausgewählte löschen</target>
+            </trans-unit>
+            <trans-unit id="clean.deselectAll" resname="clean.deselectAll">
+                <source>Deselect all</source>
+                <target>Auswahl aufheben</target>
+            </trans-unit>
+            <trans-unit id="clean.downloadBackup" resname="clean.downloadBackup">
+                <source>Download file as backup</source>
+                <target>Datei als Sicherung herunterladen</target>
+            </trans-unit>
+            <trans-unit id="clean.downloadZip" resname="clean.downloadZip">
+                <source>Download as ZIP</source>
+                <target>Als ZIP herunterladen</target>
+            </trans-unit>
+            <trans-unit id="clean.error.couldNotDelete" resname="clean.error.couldNotDelete">
+                <source>%s: could not delete file</source>
+                <target>%s: Datei konnte nicht gelöscht werden</target>
+            </trans-unit>
+            <trans-unit id="clean.error.pathRejected" resname="clean.error.pathRejected">
+                <source>%s: path rejected (security check)</source>
+                <target>%s: Pfad abgelehnt (Sicherheitsprüfung)</target>
+            </trans-unit>
+            <trans-unit id="clean.flash.deleted" resname="clean.flash.deleted">
+                <source>%s unused file(s) deleted from disk and FAL.</source>
+                <target>%s unbenutzte Datei(en) von der Festplatte und aus FAL gelöscht.</target>
+            </trans-unit>
+            <trans-unit id="clean.flash.failed" resname="clean.flash.failed">
+                <source>Cleanup failed</source>
+                <target>Bereinigung fehlgeschlagen</target>
+            </trans-unit>
+            <trans-unit id="clean.flash.flushTitle" resname="clean.flash.flushTitle">
+                <source>Folder Flush</source>
+                <target>Ordner leeren</target>
+            </trans-unit>
+            <trans-unit id="clean.js.deleteAll" resname="clean.js.deleteAll">
+                <source>Delete all</source>
+                <target>Alle löschen</target>
+            </trans-unit>
+            <trans-unit id="clean.js.deleteCount" resname="clean.js.deleteCount">
+                <source>Delete %s file(s)</source>
+                <target>%s Datei(en) löschen</target>
+            </trans-unit>
+            <trans-unit id="clean.js.deleteSelectedText" resname="clean.js.deleteSelectedText">
+                <source>Permanently delete %s selected file(s) from disk and remove FAL records. This cannot be undone.</source>
+                <target>%s ausgewählte Datei(en) endgültig von der Festplatte löschen und FAL-Einträge entfernen. Dies kann nicht rückgängig gemacht werden.</target>
+            </trans-unit>
+            <trans-unit id="clean.js.deleteSelectedTitle" resname="clean.js.deleteSelectedTitle">
+                <source>Delete selected files</source>
+                <target>Ausgewählte Dateien löschen</target>
+            </trans-unit>
+            <trans-unit id="clean.js.flushMismatch" resname="clean.js.flushMismatch">
+                <source>Does not match — expected %s.</source>
+                <target>Stimmt nicht überein – erwartet %s.</target>
+            </trans-unit>
+            <trans-unit id="clean.js.flushText" resname="clean.js.flushText">
+                <source>Permanently delete all &lt;strong&gt;%s&lt;/strong&gt; filtered file(s) from disk and remove FAL records. This cannot be undone.</source>
+                <target>Alle &lt;strong&gt;%s&lt;/strong&gt; gefilterten Datei(en) endgültig von der Festplatte löschen und FAL-Einträge entfernen. Dies kann nicht rückgängig gemacht werden.</target>
+            </trans-unit>
+            <trans-unit id="clean.js.flushTitle" resname="clean.js.flushTitle">
+                <source>Delete all filtered files</source>
+                <target>Alle gefilterten Dateien löschen</target>
+            </trans-unit>
+            <trans-unit id="clean.js.flushType" resname="clean.js.flushType">
+                <source>Type &lt;strong&gt;%s&lt;/strong&gt; below to confirm:</source>
+                <target>Zur Bestätigung unten &lt;strong&gt;%s&lt;/strong&gt; eingeben:</target>
+            </trans-unit>
+            <trans-unit id="clean.js.noSelection" resname="clean.js.noSelection">
+                <source>No selection</source>
+                <target>Keine Auswahl</target>
+            </trans-unit>
+            <trans-unit id="clean.js.noSelectionText" resname="clean.js.noSelectionText">
+                <source>No files selected. Check at least one row.</source>
+                <target>Keine Dateien ausgewählt. Mindestens eine Zeile markieren.</target>
+            </trans-unit>
+            <trans-unit id="clean.list" resname="clean.list">
+                <source>List</source>
+                <target>Liste</target>
+            </trans-unit>
+            <trans-unit id="clean.missing" resname="clean.missing">
+                <source>missing</source>
+                <target>fehlt</target>
+            </trans-unit>
+            <trans-unit id="clean.noMatch" resname="clean.noMatch">
+                <source>No files match the current filter.</source>
+                <target>Keine Dateien entsprechen dem aktuellen Filter.</target>
+            </trans-unit>
+            <trans-unit id="clean.physicallyMissing" resname="clean.physicallyMissing">
+                <source>physically missing</source>
+                <target>physisch fehlend</target>
+            </trans-unit>
+            <trans-unit id="clean.refresh" resname="clean.refresh">
+                <source>Refresh</source>
+                <target>Aktualisieren</target>
+            </trans-unit>
+            <trans-unit id="clean.selectAll" resname="clean.selectAll">
+                <source>Select all on page</source>
+                <target>Alle auf der Seite auswählen</target>
+            </trans-unit>
+            <trans-unit id="clean.selection" resname="clean.selection">
+                <source>Selection</source>
+                <target>Auswahl</target>
+            </trans-unit>
+            <trans-unit id="clean.show" resname="clean.show">
+                <source>Show</source>
+                <target>Anzeigen</target>
+            </trans-unit>
+            <trans-unit id="clean.show.all" resname="clean.show.all">
+                <source>All unreferenced</source>
+                <target>Alle nicht referenzierten</target>
+            </trans-unit>
+            <trans-unit id="clean.show.missing" resname="clean.show.missing">
+                <source>Physically missing</source>
+                <target>Physisch fehlend</target>
+            </trans-unit>
+            <trans-unit id="clean.show.present" resname="clean.show.present">
+                <source>Present on disk</source>
+                <target>Auf der Festplatte vorhanden</target>
+            </trans-unit>
+            <trans-unit id="clean.showing" resname="clean.showing">
+                <source>Showing %1$s–%2$s of %3$s</source>
+                <target>%1$s–%2$s von %3$s</target>
+            </trans-unit>
+            <trans-unit id="clean.thumbnails" resname="clean.thumbnails">
+                <source>Thumbnails</source>
+                <target>Vorschaubilder</target>
+            </trans-unit>
+            <trans-unit id="clean.title" resname="clean.title">
+                <source>File Cleanup</source>
+                <target>Dateibereinigung</target>
+            </trans-unit>
+            <trans-unit id="clean.unused" resname="clean.unused">
+                <source>Unused Files</source>
+                <target>Unbenutzte Dateien</target>
+            </trans-unit>
+            <trans-unit id="clean.unused.subtitle" resname="clean.unused.subtitle">
+                <source>%s file(s) are not referenced anywhere</source>
+                <target>%s Datei(en) werden nirgends referenziert</target>
+            </trans-unit>
+            <trans-unit id="clean.viewMode" resname="clean.viewMode">
+                <source>View mode</source>
+                <target>Ansicht</target>
+            </trans-unit>
+            <trans-unit id="common.adminOnly" resname="common.adminOnly">
+                <source>This report is available for administrators only.</source>
+                <target>Dieser Bericht steht nur Administratoren zur Verfügung.</target>
+            </trans-unit>
+            <trans-unit id="common.andSubfolders" resname="common.andSubfolders">
+                <source>and subfolders</source>
+                <target>und Unterordnern</target>
+            </trans-unit>
+            <trans-unit id="common.backToFileList" resname="common.backToFileList">
+                <source>Back to file list</source>
+                <target>Zurück zur Dateiliste</target>
+            </trans-unit>
+            <trans-unit id="common.cancel" resname="common.cancel">
+                <source>Cancel</source>
+                <target>Abbrechen</target>
+            </trans-unit>
+            <trans-unit id="common.close" resname="common.close">
+                <source>Close</source>
+                <target>Schließen</target>
+            </trans-unit>
+            <trans-unit id="common.editRecord" resname="common.editRecord">
+                <source>Edit record</source>
+                <target>Datensatz bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="common.error.adminOnly" resname="common.error.adminOnly">
+                <source>Administrators only</source>
+                <target>Nur für Administratoren</target>
+            </trans-unit>
+            <trans-unit id="common.error.fileNotFound" resname="common.error.fileNotFound">
+                <source>File not found.</source>
+                <target>Datei nicht gefunden.</target>
+            </trans-unit>
+            <trans-unit id="common.error.postRequired" resname="common.error.postRequired">
+                <source>POST required</source>
+                <target>POST erforderlich</target>
+            </trans-unit>
+            <trans-unit id="common.hidden" resname="common.hidden">
+                <source>hidden</source>
+                <target>verborgen</target>
+            </trans-unit>
+            <trans-unit id="common.in" resname="common.in">
+                <source>in</source>
+                <target>in</target>
+            </trans-unit>
+            <trans-unit id="common.lang" resname="common.lang">
+                <source>lang %s</source>
+                <target>Sprache %s</target>
+            </trans-unit>
+            <trans-unit id="common.loading" resname="common.loading">
+                <source>Loading…</source>
+                <target>Wird geladen…</target>
+            </trans-unit>
+            <trans-unit id="common.next" resname="common.next">
+                <source>Next</source>
+                <target>Weiter</target>
+            </trans-unit>
+            <trans-unit id="common.ok" resname="common.ok">
+                <source>OK</source>
+                <target>OK</target>
+            </trans-unit>
+            <trans-unit id="common.pageOf" resname="common.pageOf">
+                <source>Page %1$s of %2$s</source>
+                <target>Seite %1$s von %2$s</target>
+            </trans-unit>
+            <trans-unit id="common.path" resname="common.path">
+                <source>Path</source>
+                <target>Pfad</target>
+            </trans-unit>
+            <trans-unit id="common.previous" resname="common.previous">
+                <source>Previous</source>
+                <target>Zurück</target>
+            </trans-unit>
+            <trans-unit id="common.unknownError" resname="common.unknownError">
+                <source>Unknown error</source>
+                <target>Unbekannter Fehler</target>
+            </trans-unit>
+            <trans-unit id="common.usages" resname="common.usages">
+                <source>Usages</source>
+                <target>Verwendungen</target>
+            </trans-unit>
+            <trans-unit id="common.workspace" resname="common.workspace">
+                <source>workspace %s</source>
+                <target>Workspace %s</target>
+            </trans-unit>
+            <trans-unit id="deep.deleteConfirm" resname="deep.deleteConfirm">
+                <source>Permanently delete %s from disk and from the database? This cannot be undone.</source>
+                <target>%s endgültig von der Festplatte und aus der Datenbank löschen? Dies kann nicht rückgängig gemacht werden.</target>
+            </trans-unit>
+            <trans-unit id="deep.deleteFile" resname="deep.deleteFile">
+                <source>Delete file</source>
+                <target>Datei löschen</target>
+            </trans-unit>
+            <trans-unit id="deep.deletedRecord" resname="deep.deletedRecord">
+                <source>deleted record</source>
+                <target>gelöschter Datensatz</target>
+            </trans-unit>
+            <trans-unit id="deep.deleting" resname="deep.deleting">
+                <source>Checking again and deleting…</source>
+                <target>Erneute Prüfung und Löschen…</target>
+            </trans-unit>
+            <trans-unit id="deep.failed" resname="deep.failed">
+                <source>Deep check failed: %s</source>
+                <target>Tiefenprüfung fehlgeschlagen: %s</target>
+            </trans-unit>
+            <trans-unit id="deep.inUse" resname="deep.inUse">
+                <source>In use: %s active usage(s) found. Do not delete this file.</source>
+                <target>Verwendet: %s aktive Verwendung(en) gefunden. Diese Datei nicht löschen.</target>
+            </trans-unit>
+            <trans-unit id="deep.indexedAgain" resname="deep.indexedAgain">
+                <source>Same file indexed again: %s</source>
+                <target>Dieselbe Datei erneut indexiert: %s</target>
+            </trans-unit>
+            <trans-unit id="deep.kind.indexedTwice" resname="deep.kind.indexedTwice">
+                <source>indexed twice</source>
+                <target>doppelt indexiert</target>
+            </trans-unit>
+            <trans-unit id="deep.kind.relation" resname="deep.kind.relation">
+                <source>relation</source>
+                <target>Relation</target>
+            </trans-unit>
+            <trans-unit id="deep.noneFound" resname="deep.noneFound">
+                <source>None found.</source>
+                <target>Nichts gefunden.</target>
+            </trans-unit>
+            <trans-unit id="deep.notCovered" resname="deep.notCovered">
+                <source>Not covered: files on disk (Fluid templates, TypoScript/YAML files, site configuration) and external links to the file.</source>
+                <target>Nicht abgedeckt: Dateien auf der Festplatte (Fluid-Templates, TypoScript-/YAML-Dateien, Site-Konfiguration) und externe Links auf die Datei.</target>
+            </trans-unit>
+            <trans-unit id="deep.notDeleted" resname="deep.notDeleted">
+                <source>File not deleted</source>
+                <target>Datei nicht gelöscht</target>
+            </trans-unit>
+            <trans-unit id="deep.notes" resname="deep.notes">
+                <source>Notes</source>
+                <target>Hinweise</target>
+            </trans-unit>
+            <trans-unit id="deep.otherRecords" resname="deep.otherRecords">
+                <source>Same file indexed again in sys_file (deleting would remove it for these records too)</source>
+                <target>Dieselbe Datei erneut in sys_file indexiert (Löschen würde sie auch für diese Einträge entfernen)</target>
+            </trans-unit>
+            <trans-unit id="deep.references" resname="deep.references">
+                <source>File references</source>
+                <target>Dateireferenzen</target>
+            </trans-unit>
+            <trans-unit id="deep.refindex" resname="deep.refindex">
+                <source>Reference index (relations, links in text, forms)</source>
+                <target>Referenzindex (Relationen, Links in Texten, Formulare)</target>
+            </trans-unit>
+            <trans-unit id="deep.safe" resname="deep.safe">
+                <source>No usage found in the database. From the database's point of view, this file can be deleted.</source>
+                <target>Keine Verwendung in der Datenbank gefunden. Aus Sicht der Datenbank kann diese Datei gelöscht werden.</target>
+            </trans-unit>
+            <trans-unit id="deep.searchedFor" resname="deep.searchedFor">
+                <source>Searched for: %s</source>
+                <target>Gesucht nach: %s</target>
+            </trans-unit>
+            <trans-unit id="deep.searchedTables" resname="deep.searchedTables">
+                <source>Text columns of %s table(s) searched.</source>
+                <target>Textspalten von %s Tabelle(n) durchsucht.</target>
+            </trans-unit>
+            <trans-unit id="deep.searching" resname="deep.searching">
+                <source>Searching the whole database…</source>
+                <target>Die gesamte Datenbank wird durchsucht…</target>
+            </trans-unit>
+            <trans-unit id="deep.skippedTables" resname="deep.skippedTables">
+                <source>%s technical table(s) skipped (caches, logs, history, processed files, own metadata)</source>
+                <target>%s technische Tabelle(n) übersprungen (Caches, Logs, Verlauf, verarbeitete Dateien, eigene Metadaten)</target>
+            </trans-unit>
+            <trans-unit id="deep.sysFileUid" resname="deep.sysFileUid">
+                <source>sys_file uid</source>
+                <target>sys_file-UID</target>
+            </trans-unit>
+            <trans-unit id="deep.table" resname="deep.table">
+                <source>Table</source>
+                <target>Tabelle</target>
+            </trans-unit>
+            <trans-unit id="deep.textSearch" resname="deep.textSearch">
+                <source>Text search in all tables</source>
+                <target>Textsuche in allen Tabellen</target>
+            </trans-unit>
+            <trans-unit id="deep.textTruncated" resname="deep.textTruncated">
+                <source>Text search stopped after 50 matches.</source>
+                <target>Textsuche nach 50 Treffern beendet.</target>
+            </trans-unit>
+            <trans-unit id="deep.title" resname="deep.title">
+                <source>Deep check</source>
+                <target>Tiefenprüfung</target>
+            </trans-unit>
+            <trans-unit id="dup.adminOnly" resname="dup.adminOnly">
+                <source>The duplicate report is available for administrators only.</source>
+                <target>Der Bericht über doppelte Dateien ist nur für Administratoren verfügbar.</target>
+            </trans-unit>
+            <trans-unit id="dup.badge.easy" resname="dup.badge.easy">
+                <source>easy</source>
+                <target>einfach</target>
+            </trans-unit>
+            <trans-unit id="dup.badge.easy.title" resname="dup.badge.easy.title">
+                <source>At most one copy is used: the others can be removed without touching any record</source>
+                <target>Höchstens eine Kopie wird verwendet: Die anderen können entfernt werden, ohne einen Datensatz zu ändern</target>
+            </trans-unit>
+            <trans-unit id="dup.badge.metadataDiffers" resname="dup.badge.metadataDiffers">
+                <source>metadata differs</source>
+                <target>Metadaten unterschiedlich</target>
+            </trans-unit>
+            <trans-unit id="dup.badge.metadataDiffers.title" resname="dup.badge.metadataDiffers.title">
+                <source>Copies have different file-level title/alt text/description</source>
+                <target>Die Kopien haben unterschiedliche Titel/Alternativtexte/Beschreibungen auf Dateiebene</target>
+            </trans-unit>
+            <trans-unit id="dup.badge.severalUsed" resname="dup.badge.severalUsed">
+                <source>several used</source>
+                <target>mehrere verwendet</target>
+            </trans-unit>
+            <trans-unit id="dup.badge.severalUsed.title" resname="dup.badge.severalUsed.title">
+                <source>Several copies are used: references would need to be moved to one copy</source>
+                <target>Mehrere Kopien werden verwendet: Referenzen müssten auf eine Kopie umgestellt werden</target>
+            </trans-unit>
+            <trans-unit id="dup.badge.textLinks" resname="dup.badge.textLinks">
+                <source>text links</source>
+                <target>Textlinks</target>
+            </trans-unit>
+            <trans-unit id="dup.badge.textLinks.title" resname="dup.badge.textLinks.title">
+                <source>Linked in text fields (e.g. RTE): needs manual handling</source>
+                <target>In Textfeldern verlinkt (z. B. RTE): muss manuell bearbeitet werden</target>
+            </trans-unit>
+            <trans-unit id="dup.col.created" resname="dup.col.created">
+                <source>Created</source>
+                <target>Erstellt</target>
+            </trans-unit>
+            <trans-unit id="dup.col.metadata" resname="dup.col.metadata">
+                <source>File metadata (title / alt text / description)</source>
+                <target>Datei-Metadaten (Titel / Alternativtext / Beschreibung)</target>
+            </trans-unit>
+            <trans-unit id="dup.deepCheck.buttonTitle" resname="dup.deepCheck.buttonTitle">
+                <source>Deep check: search the whole database for any usage of this file</source>
+                <target>Tiefenprüfung: die gesamte Datenbank nach Verwendungen dieser Datei durchsuchen</target>
+            </trans-unit>
+            <trans-unit id="dup.deepCheck.modalTitle" resname="dup.deepCheck.modalTitle">
+                <source>Deep check: %s</source>
+                <target>Tiefenprüfung: %s</target>
+            </trans-unit>
+            <trans-unit id="dup.editMetadata" resname="dup.editMetadata">
+                <source>Edit file metadata (title, alt text, description)</source>
+                <target>Datei-Metadaten bearbeiten (Titel, Alternativtext, Beschreibung)</target>
+            </trans-unit>
+            <trans-unit id="dup.empty.text" resname="dup.empty.text">
+                <source>No files with identical content found.</source>
+                <target>Keine Dateien mit identischem Inhalt gefunden.</target>
+            </trans-unit>
+            <trans-unit id="dup.empty.textFolder" resname="dup.empty.textFolder">
+                <source>No files with identical content found for %s.</source>
+                <target>Keine Dateien mit identischem Inhalt für %s gefunden.</target>
+            </trans-unit>
+            <trans-unit id="dup.empty.title" resname="dup.empty.title">
+                <source>No duplicates</source>
+                <target>Keine Duplikate</target>
+            </trans-unit>
+            <trans-unit id="dup.error.deleteFailed" resname="dup.error.deleteFailed">
+                <source>Delete failed: %s</source>
+                <target>Löschen fehlgeschlagen: %s</target>
+            </trans-unit>
+            <trans-unit id="dup.error.inUse" resname="dup.error.inUse">
+                <source>File is in use (%s usage(s)), not deleted</source>
+                <target>Datei wird verwendet (%s Verwendung(en)), nicht gelöscht</target>
+            </trans-unit>
+            <trans-unit id="dup.exportCsv" resname="dup.exportCsv">
+                <source>Export CSV</source>
+                <target>CSV exportieren</target>
+            </trans-unit>
+            <trans-unit id="dup.group.copies" resname="dup.group.copies">
+                <source>%s copies</source>
+                <target>%s Kopien</target>
+            </trans-unit>
+            <trans-unit id="dup.group.each" resname="dup.group.each">
+                <source>%s each</source>
+                <target>je %s</target>
+            </trans-unit>
+            <trans-unit id="dup.group.extra" resname="dup.group.extra">
+                <source>extra</source>
+                <target>zusätzlich</target>
+            </trans-unit>
+            <trans-unit id="dup.group.usages" resname="dup.group.usages">
+                <source>%s usage(s)</source>
+                <target>%s Verwendung(en)</target>
+            </trans-unit>
+            <trans-unit id="dup.group.used" resname="dup.group.used">
+                <source>%1$s of %2$s copies used</source>
+                <target>%1$s von %2$s Kopien verwendet</target>
+            </trans-unit>
+            <trans-unit id="dup.inExtraCopies" resname="dup.inExtraCopies">
+                <source>%s in extra copies</source>
+                <target>%s in zusätzlichen Kopien</target>
+            </trans-unit>
+            <trans-unit id="dup.indexed" resname="dup.indexed">
+                <source>indexed %s×</source>
+                <target>%s× indexiert</target>
+            </trans-unit>
+            <trans-unit id="dup.indexed.title" resname="dup.indexed.title">
+                <source>This file has %s records in sys_file; usages of all records are added up</source>
+                <target>Diese Datei hat %s Einträge in sys_file; die Verwendungen aller Einträge werden addiert</target>
+            </trans-unit>
+            <trans-unit id="dup.keeper" resname="dup.keeper">
+                <source>Suggested copy to keep</source>
+                <target>Vorgeschlagene Kopie zum Behalten</target>
+            </trans-unit>
+            <trans-unit id="dup.meta.alt" resname="dup.meta.alt">
+                <source>Alt:</source>
+                <target>Alt:</target>
+            </trans-unit>
+            <trans-unit id="dup.meta.description" resname="dup.meta.description">
+                <source>Description:</source>
+                <target>Beschreibung:</target>
+            </trans-unit>
+            <trans-unit id="dup.meta.title" resname="dup.meta.title">
+                <source>Title:</source>
+                <target>Titel:</target>
+            </trans-unit>
+            <trans-unit id="dup.noReferences" resname="dup.noReferences">
+                <source>no references found</source>
+                <target>keine Referenzen gefunden</target>
+            </trans-unit>
+            <trans-unit id="dup.noReferences.title" resname="dup.noReferences.title">
+                <source>No file reference and no entry in the reference index. Run the deep check before deleting.</source>
+                <target>Keine Dateireferenz und kein Eintrag im Referenzindex. Vor dem Löschen die Tiefenprüfung ausführen.</target>
+            </trans-unit>
+            <trans-unit id="dup.note.compare" resname="dup.note.compare">
+                <source>Files are compared by content (SHA1 checksum), not by name. Only copies that exist on disk count; sizes are measured on disk.</source>
+                <target>Dateien werden nach Inhalt (SHA1-Prüfsumme) verglichen, nicht nach Namen. Es zählen nur Kopien, die auf der Festplatte existieren; Größen werden auf der Festplatte gemessen.</target>
+            </trans-unit>
+            <trans-unit id="dup.note.keeper" resname="dup.note.keeper">
+                <source>marks the suggested copy to keep (most usages, then oldest).</source>
+                <target>markiert die vorgeschlagene Kopie zum Behalten (meiste Verwendungen, dann älteste).</target>
+            </trans-unit>
+            <trans-unit id="dup.note.notOnDisk" resname="dup.note.notOnDisk">
+                <source>%s database record(s) of duplicate content are not on disk and are left out.</source>
+                <target>%s Datenbankeinträge mit doppeltem Inhalt sind nicht auf der Festplatte vorhanden und werden ausgelassen.</target>
+            </trans-unit>
+            <trans-unit id="dup.note.readOnly" resname="dup.note.readOnly">
+                <source>Read-only report: nothing is changed.</source>
+                <target>Reiner Bericht: Es wird nichts geändert.</target>
+            </trans-unit>
+            <trans-unit id="dup.showUsages" resname="dup.showUsages">
+                <source>Show where this copy is used</source>
+                <target>Anzeigen, wo diese Kopie verwendet wird</target>
+            </trans-unit>
+            <trans-unit id="dup.showing" resname="dup.showing">
+                <source>Showing groups %1$s–%2$s of %3$s, largest extra size first</source>
+                <target>Gruppen %1$s–%2$s von %3$s, größte zusätzliche Größe zuerst</target>
+            </trans-unit>
+            <trans-unit id="dup.subtitle" resname="dup.subtitle">
+                <source>%s group(s) with identical content</source>
+                <target>%s Gruppe(n) mit identischem Inhalt</target>
+            </trans-unit>
+            <trans-unit id="dup.textLinks" resname="dup.textLinks">
+                <source>+ %s text link(s)</source>
+                <target>+ %s Textlink(s)</target>
+            </trans-unit>
+            <trans-unit id="dup.title" resname="dup.title">
+                <source>Duplicate files</source>
+                <target>Doppelte Dateien</target>
+            </trans-unit>
+            <trans-unit id="dup.usages.alt" resname="dup.usages.alt">
+                <source>alt</source>
+                <target>Alt</target>
+            </trans-unit>
+            <trans-unit id="dup.usages.description" resname="dup.usages.description">
+                <source>description</source>
+                <target>Beschreibung</target>
+            </trans-unit>
+            <trans-unit id="dup.usages.field" resname="dup.usages.field">
+                <source>Field</source>
+                <target>Feld</target>
+            </trans-unit>
+            <trans-unit id="dup.usages.ownText" resname="dup.usages.ownText">
+                <source>Own text on usage</source>
+                <target>Eigener Text bei Verwendung</target>
+            </trans-unit>
+            <trans-unit id="dup.usages.page" resname="dup.usages.page">
+                <source>Page</source>
+                <target>Seite</target>
+            </trans-unit>
+            <trans-unit id="dup.usages.record" resname="dup.usages.record">
+                <source>Record</source>
+                <target>Datensatz</target>
+            </trans-unit>
+            <trans-unit id="dup.usages.recordMissing" resname="dup.usages.recordMissing">
+                <source>record missing</source>
+                <target>Datensatz fehlt</target>
+            </trans-unit>
+            <trans-unit id="dup.usages.state" resname="dup.usages.state">
+                <source>State</source>
+                <target>Status</target>
+            </trans-unit>
+            <trans-unit id="dup.usages.title" resname="dup.usages.title">
+                <source>title</source>
+                <target>Titel</target>
+            </trans-unit>
+            <trans-unit id="dup.usagesOf" resname="dup.usagesOf">
+                <source>Usages of %s</source>
+                <target>Verwendungen von %s</target>
+            </trans-unit>
+            <trans-unit id="dup.withCopyIn" resname="dup.withCopyIn">
+                <source>with a copy in</source>
+                <target>mit einer Kopie in</target>
+            </trans-unit>
+            <trans-unit id="mime.cannotFix" resname="mime.cannotFix">
+                <source>Cannot fix</source>
+                <target>Nicht korrigierbar</target>
+            </trans-unit>
+            <trans-unit id="mime.col.actual" resname="mime.col.actual">
+                <source>Actual MIME</source>
+                <target>Tatsächlicher MIME-Typ</target>
+            </trans-unit>
+            <trans-unit id="mime.col.db" resname="mime.col.db">
+                <source>DB MIME (sys_file)</source>
+                <target>DB-MIME-Typ (sys_file)</target>
+            </trans-unit>
+            <trans-unit id="mime.col.expected" resname="mime.col.expected">
+                <source>Expected MIME</source>
+                <target>Erwarteter MIME-Typ</target>
+            </trans-unit>
+            <trans-unit id="mime.col.extension" resname="mime.col.extension">
+                <source>Extension</source>
+                <target>Dateiendung</target>
+            </trans-unit>
+            <trans-unit id="mime.col.file" resname="mime.col.file">
+                <source>File</source>
+                <target>Datei</target>
+            </trans-unit>
+            <trans-unit id="mime.col.status" resname="mime.col.status">
+                <source>Status</source>
+                <target>Status</target>
+            </trans-unit>
+            <trans-unit id="mime.dbOutOfSync" resname="mime.dbOutOfSync">
+                <source>DB out of sync</source>
+                <target>DB nicht synchron</target>
+            </trans-unit>
+            <trans-unit id="mime.error.exitCode" resname="mime.error.exitCode">
+                <source>Unknown error (exit code %s)</source>
+                <target>Unbekannter Fehler (Exit-Code %s)</target>
+            </trans-unit>
+            <trans-unit id="mime.error.notIndexed" resname="mime.error.notIndexed">
+                <source>%s: not indexed in sys_file — index the file via TYPO3 file module first</source>
+                <target>%s: nicht in sys_file indexiert – Datei zuerst über das TYPO3-Dateimodul indexieren</target>
+            </trans-unit>
+            <trans-unit id="mime.error.pathRejected" resname="mime.error.pathRejected">
+                <source>%s: path rejected (security check)</source>
+                <target>%s: Pfad abgelehnt (Sicherheitsprüfung)</target>
+            </trans-unit>
+            <trans-unit id="mime.error.storage" resname="mime.error.storage">
+                <source>%s: storage could not be resolved</source>
+                <target>%s: Speicher konnte nicht ermittelt werden</target>
+            </trans-unit>
+            <trans-unit id="mime.error.unsupported" resname="mime.error.unsupported">
+                <source>Unsupported extension or MIME type.</source>
+                <target>Nicht unterstützte Dateiendung oder MIME-Typ.</target>
+            </trans-unit>
+            <trans-unit id="mime.fixSelected" resname="mime.fixSelected">
+                <source>Fix selected</source>
+                <target>Ausgewählte korrigieren</target>
+            </trans-unit>
+            <trans-unit id="mime.fixable" resname="mime.fixable">
+                <source>Fixable</source>
+                <target>Korrigierbar</target>
+            </trans-unit>
+            <trans-unit id="mime.flash.failed" resname="mime.flash.failed">
+                <source>MIME fix failed</source>
+                <target>MIME-Korrektur fehlgeschlagen</target>
+            </trans-unit>
+            <trans-unit id="mime.flash.fixed" resname="mime.flash.fixed">
+                <source>%s file(s) processed and sys_file record(s) updated.</source>
+                <target>%s Datei(en) verarbeitet und sys_file-Einträge aktualisiert.</target>
+            </trans-unit>
+            <trans-unit id="mime.flash.title" resname="mime.flash.title">
+                <source>MIME fix</source>
+                <target>MIME-Korrektur</target>
+            </trans-unit>
+            <trans-unit id="mime.issues" resname="mime.issues">
+                <source>%s issue(s) found</source>
+                <target>%s Problem(e) gefunden</target>
+            </trans-unit>
+            <trans-unit id="mime.js.fix" resname="mime.js.fix">
+                <source>Fix</source>
+                <target>Korrigieren</target>
+            </trans-unit>
+            <trans-unit id="mime.js.fixText" resname="mime.js.fixText">
+                <source>Process %s file(s): convert content and/or update sys_file records. Continue?</source>
+                <target>%s Datei(en) verarbeiten: Inhalt konvertieren und/oder sys_file-Einträge aktualisieren. Fortfahren?</target>
+            </trans-unit>
+            <trans-unit id="mime.js.fixTitle" resname="mime.js.fixTitle">
+                <source>Fix selected files</source>
+                <target>Ausgewählte Dateien korrigieren</target>
+            </trans-unit>
+            <trans-unit id="mime.js.noFiles" resname="mime.js.noFiles">
+                <source>No files selected</source>
+                <target>Keine Dateien ausgewählt</target>
+            </trans-unit>
+            <trans-unit id="mime.js.noFilesText" resname="mime.js.noFilesText">
+                <source>Select at least one file before fixing.</source>
+                <target>Vor dem Korrigieren mindestens eine Datei auswählen.</target>
+            </trans-unit>
+            <trans-unit id="mime.noIssues" resname="mime.noIssues">
+                <source>No issues found</source>
+                <target>Keine Probleme gefunden</target>
+            </trans-unit>
+            <trans-unit id="mime.noIssues.text" resname="mime.noIssues.text">
+                <source>All files in %s have correct content and matching sys_file records.</source>
+                <target>Alle Dateien in %s haben korrekten Inhalt und passende sys_file-Einträge.</target>
+            </trans-unit>
+            <trans-unit id="mime.notIndexed" resname="mime.notIndexed">
+                <source>not indexed</source>
+                <target>nicht indexiert</target>
+            </trans-unit>
+            <trans-unit id="mime.scanAgain" resname="mime.scanAgain">
+                <source>Scan again</source>
+                <target>Erneut scannen</target>
+            </trans-unit>
+            <trans-unit id="mime.selectActionable" resname="mime.selectActionable">
+                <source>Select all actionable (%s)</source>
+                <target>Alle bearbeitbaren auswählen (%s)</target>
+            </trans-unit>
+            <trans-unit id="over.card.count" resname="over.card.count">
+                <source>Oversized images</source>
+                <target>Übergroße Bilder</target>
+            </trans-unit>
+            <trans-unit id="over.card.estimated" resname="over.card.estimated">
+                <source>Estimated after resizing</source>
+                <target>Geschätzt nach Verkleinerung</target>
+            </trans-unit>
+            <trans-unit id="over.card.saving" resname="over.card.saving">
+                <source>Estimated saving</source>
+                <target>Geschätzte Ersparnis</target>
+            </trans-unit>
+            <trans-unit id="over.card.size" resname="over.card.size">
+                <source>Current size</source>
+                <target>Aktuelle Größe</target>
+            </trans-unit>
+            <trans-unit id="over.col.dimensions" resname="over.col.dimensions">
+                <source>Dimensions</source>
+                <target>Abmessungen</target>
+            </trans-unit>
+            <trans-unit id="over.col.estimated" resname="over.col.estimated">
+                <source>Estimated</source>
+                <target>Geschätzt</target>
+            </trans-unit>
+            <trans-unit id="over.col.resizedTo" resname="over.col.resizedTo">
+                <source>Resized to</source>
+                <target>Verkleinert auf</target>
+            </trans-unit>
+            <trans-unit id="over.col.saving" resname="over.col.saving">
+                <source>Saving</source>
+                <target>Ersparnis</target>
+            </trans-unit>
+            <trans-unit id="over.col.size" resname="over.col.size">
+                <source>Size</source>
+                <target>Größe</target>
+            </trans-unit>
+            <trans-unit id="over.empty.text" resname="over.empty.text">
+                <source>All images are within %1$s × %2$s px.</source>
+                <target>Alle Bilder liegen innerhalb von %1$s × %2$s px.</target>
+            </trans-unit>
+            <trans-unit id="over.empty.title" resname="over.empty.title">
+                <source>No oversized images</source>
+                <target>Keine übergroßen Bilder</target>
+            </trans-unit>
+            <trans-unit id="over.includeSubfolders" resname="over.includeSubfolders">
+                <source>Include subfolders</source>
+                <target>Unterordner einbeziehen</target>
+            </trans-unit>
+            <trans-unit id="over.js.after" resname="over.js.after">
+                <source>After resizing</source>
+                <target>Nach dem Skalieren</target>
+            </trans-unit>
+            <trans-unit id="over.js.failed" resname="over.js.failed">
+                <source>Resize failed</source>
+                <target>Skalierung fehlgeschlagen</target>
+            </trans-unit>
+            <trans-unit id="over.js.fileSize" resname="over.js.fileSize">
+                <source>File size</source>
+                <target>Dateigröße</target>
+            </trans-unit>
+            <trans-unit id="over.js.notResized" resname="over.js.notResized">
+                <source>Image not resized</source>
+                <target>Bild nicht skaliert</target>
+            </trans-unit>
+            <trans-unit id="over.js.now" resname="over.js.now">
+                <source>Now</source>
+                <target>Jetzt</target>
+            </trans-unit>
+            <trans-unit id="over.js.resizeNow" resname="over.js.resizeNow">
+                <source>Resize now</source>
+                <target>Jetzt skalieren</target>
+            </trans-unit>
+            <trans-unit id="over.js.resizing" resname="over.js.resizing">
+                <source>Resizing…</source>
+                <target>Wird skaliert…</target>
+            </trans-unit>
+            <trans-unit id="over.js.saving" resname="over.js.saving">
+                <source>Saving: %1$s (%2$s %%)</source>
+                <target>Ersparnis: %1$s (%2$s %%)</target>
+            </trans-unit>
+            <trans-unit id="over.js.testResize" resname="over.js.testResize">
+                <source>Test resize to fit %1$s × %2$s px (aspect ratio kept, format kept).</source>
+                <target>Testweise Skalierung auf maximal %1$s × %2$s px (Seitenverhältnis und Format bleiben erhalten).</target>
+            </trans-unit>
+            <trans-unit id="over.js.testing" resname="over.js.testing">
+                <source>Testing the resize…</source>
+                <target>Skalierung wird getestet…</target>
+            </trans-unit>
+            <trans-unit id="over.js.title" resname="over.js.title">
+                <source>Resize image</source>
+                <target>Bild skalieren</target>
+            </trans-unit>
+            <trans-unit id="over.js.warning" resname="over.js.warning">
+                <source>The file is replaced on the live site right away, under the same name. There is no backup: this cannot be undone. References, crops and links stay intact; thumbnails and processed images are regenerated.</source>
+                <target>Die Datei wird sofort auf der Live-Website unter demselben Namen ersetzt. Es gibt keine Sicherung: Dies kann nicht rückgängig gemacht werden. Referenzen, Zuschnitte und Links bleiben erhalten; Vorschaubilder und verarbeitete Bilder werden neu erzeugt.</target>
+            </trans-unit>
+            <trans-unit id="over.maxHeight" resname="over.maxHeight">
+                <source>Max. height (px)</source>
+                <target>Max. Höhe (px)</target>
+            </trans-unit>
+            <trans-unit id="over.maxWidth" resname="over.maxWidth">
+                <source>Max. width (px)</source>
+                <target>Max. Breite (px)</target>
+            </trans-unit>
+            <trans-unit id="over.note.defaults" resname="over.note.defaults">
+                <source>Defaults (%1$s × %2$s px, types, minimum size) come from Admin Tools › Settings › Extension Configuration › filefix.</source>
+                <target>Standardwerte (%1$s × %2$s px, Typen, Mindestgröße) stammen aus Admin Tools › Einstellungen › Extension-Konfiguration › filefix.</target>
+            </trans-unit>
+            <trans-unit id="over.note.estimate" resname="over.note.estimate">
+                <source>Estimated size = current size × (new pixels ÷ current pixels). It is a rough guide per file; for JPG the total is usually conservative (test sample: 68 % estimated, 76 % real saving). PNG files can become larger when resized.</source>
+                <target>Geschätzte Größe = aktuelle Größe × (neue Pixel ÷ aktuelle Pixel). Pro Datei nur ein grober Richtwert; bei JPG ist die Summe meist vorsichtig (Stichprobe: 68 % geschätzt, 76 % tatsächliche Ersparnis). PNG-Dateien können beim Verkleinern größer werden.</target>
+            </trans-unit>
+            <trans-unit id="over.note.notOnDisk" resname="over.note.notOnDisk">
+                <source>%s image(s) from the database are not on disk and are left out.</source>
+                <target>%s Bild(er) aus der Datenbank sind nicht auf dem Datenträger vorhanden und werden ausgelassen.</target>
+            </trans-unit>
+            <trans-unit id="over.note.onDisk" resname="over.note.onDisk">
+                <source>Only images that exist on disk are listed; sizes are measured on disk.</source>
+                <target>Es werden nur Bilder aufgeführt, die auf dem Datenträger existieren; Größen werden auf dem Datenträger gemessen.</target>
+            </trans-unit>
+            <trans-unit id="over.note.otherDimensions" resname="over.note.otherDimensions">
+                <source>This view uses other dimensions.</source>
+                <target>Diese Ansicht verwendet andere Maße.</target>
+            </trans-unit>
+            <trans-unit id="over.note.readOnly" resname="over.note.readOnly">
+                <source>Read-only report: nothing is changed. Image types: %s.</source>
+                <target>Nur-Lese-Bericht: Es wird nichts verändert. Bildtypen: %s.</target>
+            </trans-unit>
+            <trans-unit id="over.note.unknownDimensions" resname="over.note.unknownDimensions">
+                <source>%s image(s) without known dimensions are not included.</source>
+                <target>%s Bild(er) ohne bekannte Abmessungen sind nicht enthalten.</target>
+            </trans-unit>
+            <trans-unit id="over.reportOnly" resname="over.reportOnly">
+                <source>report only</source>
+                <target>nur Bericht</target>
+            </trans-unit>
+            <trans-unit id="over.reportOnly.title" resname="over.reportOnly.title">
+                <source>Resizing is enabled for: %s</source>
+                <target>Verkleinern ist aktiviert für: %s</target>
+            </trans-unit>
+            <trans-unit id="over.resize" resname="over.resize">
+                <source>Resize</source>
+                <target>Verkleinern</target>
+            </trans-unit>
+            <trans-unit id="over.resize.buttonTitle" resname="over.resize.buttonTitle">
+                <source>Test and resize this image to %1$s × %2$s px</source>
+                <target>Dieses Bild testen und auf %1$s × %2$s px verkleinern</target>
+            </trans-unit>
+            <trans-unit id="over.resize.modalTitle" resname="over.resize.modalTitle">
+                <source>Resize %s</source>
+                <target>%s verkleinern</target>
+            </trans-unit>
+            <trans-unit id="over.resize.settingsHint" resname="over.resize.settingsHint">
+                <source>Resizing uses the limits from the extension settings</source>
+                <target>Beim Verkleinern gelten die Grenzen aus den Extension-Einstellungen</target>
+            </trans-unit>
+            <trans-unit id="over.resize.settingsLabel" resname="over.resize.settingsLabel">
+                <source>settings: %1$s × %2$s</source>
+                <target>Einstellungen: %1$s × %2$s</target>
+            </trans-unit>
+            <trans-unit id="over.showing" resname="over.showing">
+                <source>Showing %1$s–%2$s of %3$s, largest saving first</source>
+                <target>Zeige %1$s–%2$s von %3$s, größte Ersparnis zuerst</target>
+            </trans-unit>
+            <trans-unit id="over.subtitle" resname="over.subtitle">
+                <source>larger than %1$s × %2$s px</source>
+                <target>größer als %1$s × %2$s px</target>
+            </trans-unit>
+            <trans-unit id="over.title" resname="over.title">
+                <source>Oversized images</source>
+                <target>Übergroße Bilder</target>
+            </trans-unit>
+            <trans-unit id="over.update" resname="over.update">
+                <source>Update</source>
+                <target>Aktualisieren</target>
+            </trans-unit>
+            <trans-unit id="resize.done" resname="resize.done">
+                <source>Image resized.</source>
+                <target>Bild skaliert.</target>
+            </trans-unit>
+            <trans-unit id="resize.dryRun" resname="resize.dryRun">
+                <source>Dry run: nothing was changed.</source>
+                <target>Testlauf: Es wurde nichts geändert.</target>
+            </trans-unit>
+            <trans-unit id="resize.error.processing" resname="resize.error.processing">
+                <source>Image processing failed (ImageMagick/GraphicsMagick).</source>
+                <target>Die Bildverarbeitung ist fehlgeschlagen (ImageMagick/GraphicsMagick).</target>
+            </trans-unit>
+            <trans-unit id="resize.error.replace" resname="resize.error.replace">
+                <source>Replacing the file failed: %s</source>
+                <target>Das Ersetzen der Datei ist fehlgeschlagen: %s</target>
+            </trans-unit>
+            <trans-unit id="resize.flash.text" resname="resize.flash.text">
+                <source>%1$s: %2$s × %3$s, %4$s → %5$s × %6$s, %7$s (saved %8$s)</source>
+                <target>%1$s: %2$s × %3$s, %4$s → %5$s × %6$s, %7$s (%8$s gespart)</target>
+            </trans-unit>
+            <trans-unit id="resize.flash.title" resname="resize.flash.title">
+                <source>Image resized</source>
+                <target>Bild skaliert</target>
+            </trans-unit>
+            <trans-unit id="resize.indexedTwice" resname="resize.indexedTwice">
+                <source>This file is indexed more than once in sys_file; resizing would leave the other records with wrong size and dimensions.</source>
+                <target>Diese Datei ist mehrfach in sys_file indexiert; beim Skalieren hätten die anderen Datensätze falsche Größe und Abmessungen.</target>
+            </trans-unit>
+            <trans-unit id="resize.localOnly" resname="resize.localOnly">
+                <source>Only local file storages are supported.</source>
+                <target>Nur lokale Dateispeicher werden unterstützt.</target>
+            </trans-unit>
+            <trans-unit id="resize.missing" resname="resize.missing">
+                <source>The file does not exist on disk.</source>
+                <target>Die Datei existiert nicht auf der Festplatte.</target>
+            </trans-unit>
+            <trans-unit id="resize.noDimensions" resname="resize.noDimensions">
+                <source>The image dimensions cannot be read.</source>
+                <target>Die Bildabmessungen können nicht gelesen werden.</target>
+            </trans-unit>
+            <trans-unit id="resize.notSmaller" resname="resize.notSmaller">
+                <source>The resized image would not be smaller enough; the original is kept.</source>
+                <target>Das skalierte Bild wäre nicht deutlich kleiner; das Original bleibt erhalten.</target>
+            </trans-unit>
+            <trans-unit id="resize.notWritable" resname="resize.notWritable">
+                <source>The file is not writable.</source>
+                <target>Die Datei ist nicht beschreibbar.</target>
+            </trans-unit>
+            <trans-unit id="resize.reportOnlyType" resname="resize.reportOnlyType">
+                <source>Type ".%1$s" is report-only: resizing is enabled for %2$s.</source>
+                <target>Typ „.%1$s“ wird nur gemeldet: Skalieren ist aktiviert für %2$s.</target>
+            </trans-unit>
+            <trans-unit id="resize.withinLimits" resname="resize.withinLimits">
+                <source>The image (%1$s × %2$s) is already within the limits; the metadata in TYPO3 may be outdated.</source>
+                <target>Das Bild (%1$s × %2$s) liegt bereits innerhalb der Grenzen; die Metadaten in TYPO3 sind möglicherweise veraltet.</target>
+            </trans-unit>
+            <trans-unit id="toolbar.duplicates" resname="toolbar.duplicates">
+                <source>Find duplicates</source>
+                <target>Duplikate finden</target>
+            </trans-unit>
+            <trans-unit id="toolbar.duplicates.loading" resname="toolbar.duplicates.loading">
+                <source>Searching for duplicate files…</source>
+                <target>Suche nach doppelten Dateien…</target>
+            </trans-unit>
+            <trans-unit id="toolbar.duplicates.title" resname="toolbar.duplicates.title">
+                <source>List files with identical content and their usages</source>
+                <target>Dateien mit identischem Inhalt und ihre Verwendungen auflisten</target>
+            </trans-unit>
+            <trans-unit id="toolbar.oversized" resname="toolbar.oversized">
+                <source>Oversized images</source>
+                <target>Übergroße Bilder</target>
+            </trans-unit>
+            <trans-unit id="toolbar.oversized.loading" resname="toolbar.oversized.loading">
+                <source>Searching for oversized images…</source>
+                <target>Suche nach übergroßen Bildern…</target>
+            </trans-unit>
+            <trans-unit id="toolbar.oversized.title" resname="toolbar.oversized.title">
+                <source>List images larger than a maximum size and the space resizing would save</source>
+                <target>Bilder über einer Maximalgröße und den durch Skalieren einsparbaren Speicher auflisten</target>
+            </trans-unit>
+            <trans-unit id="toolbar.scan" resname="toolbar.scan">
+                <source>Scan MIME</source>
+                <target>MIME scannen</target>
+            </trans-unit>
+            <trans-unit id="toolbar.scan.loading" resname="toolbar.scan.loading">
+                <source>Scanning for MIME type mismatches…</source>
+                <target>Suche nach falschen MIME-Typen…</target>
+            </trans-unit>
+            <trans-unit id="toolbar.scan.title" resname="toolbar.scan.title">
+                <source>Scan folder for MIME type mismatches</source>
+                <target>Ordner auf falsche MIME-Typen prüfen</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

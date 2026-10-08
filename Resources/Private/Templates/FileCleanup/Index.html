@@ -8,22 +8,21 @@
 <f:section name="Content">
 
 <f:be.pageRenderer includeJavaScriptModules="{0: '@anubit/filefix/file-cleanup.js'}" />
+<f:comment>Translated labels for the JavaScript modules</f:comment>
+<div id="filefix-labels" hidden="hidden" data-labels="{jsLabels -> f:format.json()}"></div>
 
 <div id="filefix-loading" class="d-none position-fixed top-0 start-0 w-100 h-100 flex-column align-items-center justify-content-center gap-2 bg-body bg-opacity-75" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:1050;background-color:rgba(var(--bs-body-bg-rgb, 255, 255, 255), .75)">
     <core:icon identifier="spinner-circle" size="large" />
-    <span class="text-body-secondary">Loading…</span>
+    <span class="text-body-secondary"><f:translate key="common.loading" extensionName="Filefix" /></span>
 </div>
 
-<h1>File Cleanup</h1>
+<h1><f:translate key="clean.title" extensionName="Filefix" /></h1>
 
 <f:if condition="{totalUnfiltered} == 0">
     <div class="t3-filelist-info-container">
         <core:icon identifier="actions-check" size="large" />
-        <h5 class="mt-2">All clean</h5>
-        <p>
-            No unused files or orphaned FAL records found
-            <f:if condition="{folderName} != ''"> in <strong>{folderName}</strong></f:if>.
-        </p>
+        <h5 class="mt-2"><f:translate key="clean.allClean" extensionName="Filefix" /></h5>
+        <p><f:if condition="{folderName} != ''"><f:then><f:translate key="clean.allClean.textFolder" extensionName="Filefix" arguments="{0: folderName}" /></f:then><f:else><f:translate key="clean.allClean.text" extensionName="Filefix" /></f:else></f:if></p>
     </div>
 </f:if>
 
@@ -33,8 +32,8 @@
         <div class="col">
             <h2 class="mb-0">
                 <core:icon identifier="mimetypes-media-image" size="small" />
-                Unused Files
-                <small class="text-body-secondary fs-6 fw-normal ms-2">{unusedCount} file(s) are not referenced anywhere<f:if condition="{folderName} != ''"> in <strong>{folderName}</strong></f:if></small>
+                <f:translate key="clean.unused" extensionName="Filefix" />
+                <small class="text-body-secondary fs-6 fw-normal ms-2"><f:translate key="clean.unused.subtitle" extensionName="Filefix" arguments="{0: unusedCount}" /><f:if condition="{folderName} != ''"> <f:translate key="common.in" extensionName="Filefix" /> <strong>{folderName}</strong></f:if></small>
             </h2>
         </div>
         <div class="col-auto d-flex align-items-center gap-2">
@@ -47,9 +46,9 @@
                 <input type="hidden" name="viewMode" value="{viewMode}" />
                 <select name="show" class="form-select form-select-sm" style="width:auto"
                         data-filefix-autosubmit="1">
-                    <option value="all"     <f:if condition="{showFilter} == 'all'">selected="selected"</f:if>>All unreferenced</option>
-                    <option value="present" <f:if condition="{showFilter} == 'present'">selected="selected"</f:if>>Present on disk</option>
-                    <option value="missing" <f:if condition="{showFilter} == 'missing'">selected="selected"</f:if>>Physically missing</option>
+                    <option value="all"     <f:if condition="{showFilter} == 'all'">selected="selected"</f:if>><f:translate key="clean.show.all" extensionName="Filefix" /></option>
+                    <option value="present" <f:if condition="{showFilter} == 'present'">selected="selected"</f:if>><f:translate key="clean.show.present" extensionName="Filefix" /></option>
+                    <option value="missing" <f:if condition="{showFilter} == 'missing'">selected="selected"</f:if>><f:translate key="clean.show.missing" extensionName="Filefix" /></option>
                 </select>
             </form>
 
@@ -62,7 +61,7 @@
                     <input type="hidden" name="viewMode" value="{viewMode}" />
                     <select name="ext" class="form-select form-select-sm" style="width:auto"
                             data-filefix-autosubmit="1">
-                        <option value="" <f:if condition="{extFilter} == ''">selected="selected"</f:if>>All types</option>
+                        <option value="" <f:if condition="{extFilter} == ''">selected="selected"</f:if>><f:translate key="clean.allTypes" extensionName="Filefix" /></option>
                         <f:for each="{availableExtensions}" as="extOption">
                             <option value="{extOption}" <f:if condition="{extFilter} == {extOption}">selected="selected"</f:if>>.{extOption}</option>
                         </f:for>
@@ -71,18 +70,18 @@
             </f:if>
 
             <!-- ── View mode toggle ── -->
-            <div class="btn-group" role="group" aria-label="View mode">
+            <div class="btn-group" role="group" aria-label="{f:translate(key: 'clean.viewMode', extensionName: 'Filefix')}">
                 <a href="{viewListUrl}" data-filefix-view="list"
                    class="btn btn-sm {f:if(condition:'{viewMode} == \'list\'', then:'btn-primary', else:'btn-default')}">
-                    <core:icon identifier="actions-viewmode-list" size="small" /> List
+                    <core:icon identifier="actions-viewmode-list" size="small" /> <f:translate key="clean.list" extensionName="Filefix" />
                 </a>
                 <a href="{viewThumbsUrl}" data-filefix-view="thumbs"
                    class="btn btn-sm {f:if(condition:'{viewMode} == \'thumbs\'', then:'btn-primary', else:'btn-default')}">
-                    <core:icon identifier="actions-viewmode-tiles" size="small" /> Thumbnails
+                    <core:icon identifier="actions-viewmode-tiles" size="small" /> <f:translate key="clean.thumbnails" extensionName="Filefix" />
                 </a>
             </div>
 
-            <span class="text-body-secondary small">Show</span>
+            <span class="text-body-secondary small"><f:translate key="clean.show" extensionName="Filefix" /></span>
             <form method="get" action="{cleanupActionUrl}" class="d-inline">
                 <input type="hidden" name="id" value="{folderId}" />
                 <input type="hidden" name="show" value="{showFilter}" />
@@ -106,7 +105,7 @@
                 <button type="button" id="flush-folder-btn" class="btn btn-danger btn-sm"
                         data-count="{unusedCount}" <f:if condition="{unusedCount} == 0">disabled="disabled"</f:if>>
                     <core:icon identifier="actions-delete" size="small" />
-                    Delete all filtered ({unusedCount})
+                    <f:translate key="clean.deleteAllFiltered" extensionName="Filefix" arguments="{0: unusedCount}" />
                 </button>
             </form>
         </div>
@@ -122,25 +121,25 @@
 
         <div class="row row-cols-auto gx-2 mb-2 align-items-center">
             <div class="col">
-                <strong>Selection</strong>
+                <strong><f:translate key="clean.selection" extensionName="Filefix" /></strong>
             </div>
             <div class="col">
                 <button type="button" class="btn btn-default btn-sm" id="cleanup-select-all-unused">
                     <core:icon identifier="actions-check" size="small" />
-                    <span id="cleanup-label-unused">Select all on page</span>
+                    <span id="cleanup-label-unused"><f:translate key="clean.selectAll" extensionName="Filefix" /></span>
                 </button>
             </div>
             <div class="col">
                 <button type="submit" class="btn btn-default btn-sm"
                         formaction="{downloadZipUrl}">
                     <core:icon identifier="actions-download" size="small" />
-                    Download as ZIP
+                    <f:translate key="clean.downloadZip" extensionName="Filefix" />
                 </button>
             </div>
             <div class="col">
                 <button type="button" id="delete-selected-btn" class="btn btn-danger btn-sm">
                     <core:icon identifier="actions-delete" size="small" />
-                    Delete selected
+                    <f:translate key="clean.deleteSelected" extensionName="Filefix" />
                 </button>
             </div>
         </div>
@@ -150,7 +149,7 @@
         <div data-filefix-view-panel="thumbs" class="{f:if(condition:'{viewMode} != \'thumbs\'', then:'d-none')}">
                 <div class="row row-cols-auto g-3 filefix-cleanup-thumbs">
                     <f:if condition="{unusedCount} == 0">
-                        <div class="col text-body-secondary">No files match the current filter.</div>
+                        <div class="col text-body-secondary"><f:translate key="clean.noMatch" extensionName="Filefix" /></div>
                     </f:if>
                     <f:for each="{unusedFiles}" as="file">
                         <div class="col" style="width:150px">
@@ -175,7 +174,7 @@
                                         <div class="small text-truncate" title="{file.identifier}">{file.name}</div>
                                     </div>
                                     <f:if condition="{file.physicallyMissing}">
-                                        <span class="badge bg-warning text-dark">missing</span>
+                                        <span class="badge bg-warning text-dark"><f:translate key="clean.missing" extensionName="Filefix" /></span>
                                     </f:if>
                                     <div class="text-body-secondary" style="font-size:.75rem">
                                         <f:format.bytes decimals="1">{file.size}</f:format.bytes>
@@ -192,17 +191,17 @@
                         <thead>
                             <tr>
                                 <th class="col-checkbox"></th>
-                                <th>Path</th>
-                                <th>MIME type</th>
-                                <th>Size</th>
-                                <th>Last modified</th>
+                                <th><f:translate key="common.path" extensionName="Filefix" /></th>
+                                <th><f:translate key="clean.col.mimeType" extensionName="Filefix" /></th>
+                                <th><f:translate key="clean.col.size" extensionName="Filefix" /></th>
+                                <th><f:translate key="clean.col.modified" extensionName="Filefix" /></th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             <f:if condition="{unusedCount} == 0">
                                 <tr>
-                                    <td colspan="6" class="text-body-secondary">No files match the current filter.</td>
+                                    <td colspan="6" class="text-body-secondary"><f:translate key="clean.noMatch" extensionName="Filefix" /></td>
                                 </tr>
                             </f:if>
                             <f:for each="{unusedFiles}" as="file">
@@ -218,7 +217,7 @@
                                                 <div class="d-flex align-items-center gap-1">
                                                     <span class="text-warning"><core:icon identifier="actions-exclamation-triangle" size="small" /></span>
                                                     <code class="small text-danger">{file.identifier}</code>
-                                                    <span class="badge bg-warning text-dark ms-1">physically missing</span>
+                                                    <span class="badge bg-warning text-dark ms-1"><f:translate key="clean.physicallyMissing" extensionName="Filefix" /></span>
                                                 </div>
                                             </f:then>
                                             <f:else>
@@ -234,7 +233,7 @@
                                             <a href="{storagePublicBase}{file.identifier}"
                                                download="{file.name}"
                                                class="btn btn-default btn-sm"
-                                               title="Download file as backup">
+                                               title="{f:translate(key: 'clean.downloadBackup', extensionName: 'Filefix')}">
                                                 <core:icon identifier="actions-download" size="small" />
                                             </a>
                                         </f:if>
@@ -250,18 +249,18 @@
     <!-- Pagination -->
     <div class="row align-items-center mt-1 mb-4">
         <div class="col">
-            <small class="text-body-secondary">Showing {rangeFrom}–{rangeTo} of {unusedCount}</small>
+            <small class="text-body-secondary"><f:translate key="clean.showing" extensionName="Filefix" arguments="{0: rangeFrom, 1: rangeTo, 2: unusedCount}" /></small>
         </div>
         <div class="col-auto d-flex align-items-center gap-2">
             <f:if condition="{prevPageUrl}">
                 <a href="{prevPageUrl}" class="btn btn-default btn-sm">
-                    <core:icon identifier="actions-arrow-left" size="small" /> Previous
+                    <core:icon identifier="actions-arrow-left" size="small" /> <f:translate key="common.previous" extensionName="Filefix" />
                 </a>
             </f:if>
-            <span class="text-body-secondary small">Page {currentPage} of {totalPages}</span>
+            <span class="text-body-secondary small"><f:translate key="common.pageOf" extensionName="Filefix" arguments="{0: currentPage, 1: totalPages}" /></span>
             <f:if condition="{nextPageUrl}">
                 <a href="{nextPageUrl}" class="btn btn-default btn-sm">
-                    Next <core:icon identifier="actions-arrow-right" size="small" />
+                    <f:translate key="common.next" extensionName="Filefix" /> <core:icon identifier="actions-arrow-right" size="small" />
                 </a>
             </f:if>
         </div>
